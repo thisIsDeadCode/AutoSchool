@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace AutoSchool.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
     public class UserController : ControllerBase
     {
 
@@ -19,8 +18,9 @@ namespace AutoSchool.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet(Name = "GetUsers")]
-        public IEnumerable<User> Get()
+        [HttpGet]
+        [Route("User/GetUsers")]
+        public ActionResult<IEnumerable<User>> GetUsers()
         {
             return _dbContext.Users.ToList();
         }

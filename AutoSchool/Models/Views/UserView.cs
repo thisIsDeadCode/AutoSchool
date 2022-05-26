@@ -13,5 +13,6 @@
         public string? UserNameInstagram { get; set; }
         public string? UserNameTwitter { get; set; }
         public string? PhotoId { get; set; }
+        public List<string> Errors { get; set; }
     }
 }

@@ -2,14 +2,13 @@
 using AutoSchool.Models.Views;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoSchool.Extensions;
 
 namespace AutoSchool.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
     public class CourseController : ControllerBase
     {
-
         private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _dbContext;
 
@@ -20,10 +19,11 @@ namespace AutoSchool.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet(Name = "GetCourses")]
-        public IEnumerable<CourseView> Get()
+        [HttpGet]
+        [Route("Course/GetAllCourses")]
+        public IEnumerable<CourseView> GetAllCourses()
         {
-             var courses = _dbContext.Courses
+            var courses =  _dbContext.Courses
                 .Include(t => t.Teacher)    
                     .ThenInclude(u=>u.User)
                 .Include(st => st.StudentsCoursies)
@@ -39,6 +39,7 @@ namespace AutoSchool.Controllers
                 {
                     Id = course.Id,
                     Name = course.Name,
+                    Progress = 0,
                     Teacher = new TeacherView()
                     {
                         Id = course.Teacher.UserId,
@@ -73,6 +74,10 @@ namespace AutoSchool.Controllers
                 coursesView.Add(courseView);
             }
 
+            if (User != null && User.Identity.IsAuthenticated)
+            {
+                coursesView.LoadProgressToCourses();
+            }
 
             return coursesView;
         }

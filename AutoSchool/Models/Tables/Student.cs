@@ -6,5 +6,6 @@
         public User User { get; set; }
 
         public IEnumerable<StudentsCourses> StudentsCoursies { get; set; }
+        public IEnumerable<ResultTest> ResultTests { get; set; }
     }
 }

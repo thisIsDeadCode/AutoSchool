@@ -3,6 +3,7 @@ using AutoSchool.Models.Views;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoSchool.Extensions;
+using AutoSchool.Models.Tables;
 
 namespace AutoSchool.Controllers
 {
@@ -21,7 +22,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Course/GetAllCourses")]
-        public IEnumerable<CourseView> GetAllCourses()
+        public async Task<ActionResult<IEnumerable<CourseView>>> GetAllCourses()
         {
             var courses =  _dbContext.Courses
                 .Include(t => t.Teacher)    
@@ -74,9 +75,11 @@ namespace AutoSchool.Controllers
                 coursesView.Add(courseView);
             }
 
-            if (User != null && User.Identity.IsAuthenticated)
+            User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (userDb != null && User.Identity.IsAuthenticated)
             {
-                coursesView.LoadProgressToCourses();
+                coursesView.LoadProgressToCourses(_dbContext, userDb.Id);
             }
 
             return coursesView;

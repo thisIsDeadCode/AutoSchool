@@ -12,6 +12,12 @@ namespace AutoSchool.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<StudentsCourses> StudentsCourses { get; set; }
+        public DbSet<Theme> Themes { get; set; }
+        public DbSet<Test> Tests { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+        public DbSet<Lecture> Lectures { get; set; }
+        public DbSet<ResultTest> ResultTests { get; set; }
         public DbSet<File> Files { get; set; }
 
 
@@ -23,18 +29,41 @@ namespace AutoSchool.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Answer>().HasKey("Id");
             modelBuilder.Entity<Course>().HasKey("Id");
             modelBuilder.Entity<File>().HasKey("Id");
+            modelBuilder.Entity<Lecture>().HasKey("Id");
+            modelBuilder.Entity<Question>().HasKey("Id");
             modelBuilder.Entity<Student>().HasKey("UserId");
             modelBuilder.Entity<StudentsCourses>().HasKey("StudentId", "CourseId");
             modelBuilder.Entity<Teacher>().HasKey("UserId");
+            modelBuilder.Entity<Test>().HasKey("Id");
+            modelBuilder.Entity<Theme>().HasKey("Id");
             modelBuilder.Entity<User>().HasKey("Id");
-
 
             modelBuilder.Entity<User>().HasOne(u => u.Student).WithOne(u => u.User);
             modelBuilder.Entity<User>().HasOne(t => t.Teacher).WithOne(u => u.User);
+            modelBuilder.Entity<User>().HasMany(t => t.Files).WithOne(u => u.User);
 
             modelBuilder.Entity<Course>().HasOne(t => t.Teacher).WithMany(c => c.Courses);
+            modelBuilder.Entity<Course>().HasMany(t => t.Themes).WithOne(c => c.Course).HasForeignKey(x => x.CourseId);
+
+            modelBuilder.Entity<Theme>().HasOne(t => t.Test).WithOne(c => c.Theme).HasForeignKey<Test>(x=>x.Id);
+            modelBuilder.Entity<Theme>().HasMany(t => t.Lectures).WithOne(c => c.Theme);
+
+            modelBuilder.Entity<Test>().HasMany(t => t.Questions).WithOne(c => c.Test);
+            modelBuilder.Entity<Question>().HasMany(t => t.Answers).WithOne(c => c.Question);
+
+            modelBuilder.Entity<ResultTest>()
+                .HasOne(t => t.Student)
+                .WithMany(c => c.ResultTests)
+                .HasForeignKey(x => x.StudentUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<ResultTest>()
+                .HasOne(t => t.Test)
+                .WithMany(c => c.ResultTests)
+                .HasForeignKey(x => x.TestId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<StudentsCourses>()
                 .HasOne(s => s.Course)
@@ -106,6 +135,8 @@ namespace AutoSchool.Data
                 {
                     CourseId = rnd.Next(1, 10),
                     StudentId = student.UserId,
+                    Progress = rnd.Next(0, 100),
+                    Status = "status"
                 });
             }
 

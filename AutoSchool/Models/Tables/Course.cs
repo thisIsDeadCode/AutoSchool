@@ -13,6 +13,7 @@ namespace AutoSchool.Models.Tables
         public long TeacherId { get; set; }
         public Teacher Teacher { get; set; }
 
+        public IEnumerable<Theme> Themes { get; set; }
         public IEnumerable<StudentsCourses> StudentsCoursies { get; set; }
     }
 }

@@ -17,5 +17,11 @@ namespace AutoSchool.Extensions
                 course.Progress = ctc == null ? 0 : ctc.Progress;
             }
         }
+
+        public static void LoadProgressToCourse(this CourseView course, ApplicationDbContext dbContext, long UserId)
+        {
+            StudentsCourses? studentCourse = dbContext.StudentsCourses.FirstOrDefault(x => x.StudentId == UserId && x.CourseId == course.Id);
+            course.Progress = studentCourse == null ? 0 : studentCourse.Progress;
+        }
     }
 }

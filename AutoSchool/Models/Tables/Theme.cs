@@ -1,12 +1,12 @@
-﻿namespace AutoSchool.Models.Tables
+﻿using AutoSchool.Models.Interfaces;
+
+namespace AutoSchool.Models.Tables
 {
-    public class Theme
+    public class Theme : IModelToSaveInVisitHistory
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public string Status { get; set; }
         public string? Description { get; set; }
-        public DateTime? LastVisit { get; set; }
 
 
         public long CourseId { get; set; }
@@ -15,5 +15,6 @@
         public Test Test { get; set; }
 
         public IEnumerable<Lecture> Lectures { get; set; }
+        public IEnumerable<VisitHistory> Visits { get; set; }
     }
 }

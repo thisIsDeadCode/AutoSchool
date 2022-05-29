@@ -1,4 +1,5 @@
 using AutoSchool.Data;
+using AutoSchool.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                     {
                         options.LoginPath = new PathString("/Login");
                     });
+
+builder.Services.AddTransient<HistoryService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

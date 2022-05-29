@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoSchool.Extensions;
 using AutoSchool.Models.Tables;
+using AutoSchool.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AutoSchool.Controllers
 {
@@ -12,11 +14,14 @@ namespace AutoSchool.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _dbContext;
+        private readonly HistoryService _historyService;
 
         public CourseController(ILogger<UserController> logger,
+            HistoryService history,
             ApplicationDbContext dbContext)
         {
             _logger = logger;
+            _historyService = history;
             _dbContext = dbContext;
         }
 
@@ -24,10 +29,10 @@ namespace AutoSchool.Controllers
         [Route("Course/GetAllCourses")]
         public async Task<ActionResult<IEnumerable<CourseView>>> GetAllCourses()
         {
-            var courses =  _dbContext.Courses
-                .Include(t => t.Teacher)    
-                    .ThenInclude(u=>u.User)
-                .Include(st => st.StudentsCoursies)
+            var courses = _dbContext.Courses
+                .Include(t => t.Teacher)
+                    .ThenInclude(u => u.User)
+                .Include(st => st.StudentsCoursies.Take(5))
                     .ThenInclude(stc => stc.Student)
                         .ThenInclude(s => s.User)
                 .ToList();
@@ -36,43 +41,7 @@ namespace AutoSchool.Controllers
 
             foreach (var course in courses)
             {
-                var courseView = new CourseView()
-                {
-                    Id = course.Id,
-                    Name = course.Name,
-                    Progress = 0,
-                    Teacher = new TeacherView()
-                    {
-                        Id = course.Teacher.UserId,
-                        UserName = course.Teacher.User.UserName,
-                        Email = course.Teacher.User.Email,
-                        FullName = course.Teacher.User.FullName,
-                        Location = course.Teacher.User.Location,
-                        PhoneNumber = course.Teacher.User.PhoneNumber,
-                        PhotoId = null,
-                        FacebookURL = course.Teacher.User.FacebookURL,
-                        UserNameInstagram = course.Teacher.User.UserNameInstagram,
-                        UserNameTelegram = course.Teacher.User.UserNameTelegram,
-                        UserNameTwitter = course.Teacher.User.UserNameTwitter,
-                    },
-                    Description = course.Description,
-                    Students = course.StudentsCoursies.Select(s => new StudentView()
-                    {
-                        Id = s.Student.UserId,
-                        UserName = s.Student.User.UserName,
-                        Email = s.Student.User.Email,
-                        FullName = s.Student.User.FullName,
-                        Location = s.Student.User.Location,
-                        PhoneNumber = s.Student.User.PhoneNumber,
-                        PhotoId = null,
-                        FacebookURL = s.Student.User.FacebookURL,
-                        UserNameInstagram = s.Student.User.UserNameInstagram,
-                        UserNameTelegram = s.Student.User.UserNameTelegram,
-                        UserNameTwitter = s.Student.User.UserNameTwitter,
-                    })
-                };
-
-                coursesView.Add(courseView);
+                coursesView.Add(course.ConvertCourseToCourseView());
             }
 
             User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
@@ -83,6 +52,36 @@ namespace AutoSchool.Controllers
             }
 
             return coursesView;
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("Course/Get")]
+        public async Task<ActionResult<CourseView>> Get(long Id)
+        {
+            Course? course = await _dbContext.Courses
+                                             .Include(t => t.Teacher)
+                                                .ThenInclude(u => u.User)
+                                              .Include(st => st.StudentsCoursies)
+                                                .ThenInclude(stc => stc.Student)
+                                                  .ThenInclude(s => s.User)
+                                              .FirstOrDefaultAsync(x=> x.Id == Id);
+
+            User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (course != null && userDb != null)
+            {
+                CourseView courseView = course.ConvertCourseToCourseView();
+                courseView.LoadProgressToCourse(_dbContext, userDb.Id);
+
+                await _historyService.SaveTohistory(userDb, course);
+
+                return courseView;
+            }
+            else
+            {
+                return StatusCode(404);
+            }
         }
     }
 }

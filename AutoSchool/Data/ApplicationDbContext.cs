@@ -19,6 +19,7 @@ namespace AutoSchool.Data
         public DbSet<Lecture> Lectures { get; set; }
         public DbSet<ResultTest> ResultTests { get; set; }
         public DbSet<File> Files { get; set; }
+        public DbSet<VisitHistory> VisitHistories { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -54,6 +55,12 @@ namespace AutoSchool.Data
             modelBuilder.Entity<Test>().HasMany(t => t.Questions).WithOne(c => c.Test);
             modelBuilder.Entity<Question>().HasMany(t => t.Answers).WithOne(c => c.Question);
 
+            modelBuilder.Entity<VisitHistory>().HasOne(t => t.Course).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<VisitHistory>().HasOne(t => t.Theme).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<VisitHistory>().HasOne(t => t.Lecture).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<VisitHistory>().HasOne(t => t.Test).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
+
+
             modelBuilder.Entity<ResultTest>()
                 .HasOne(t => t.Student)
                 .WithMany(c => c.ResultTests)
@@ -81,6 +88,8 @@ namespace AutoSchool.Data
             var students = new List<Student>();
             var courses = new List<Course>();
             var studentsCourses = new List<StudentsCourses>();
+            var themes = new List<Theme>();
+            var lectures = new List<Lecture>();
 
 
             for (int i = 1; i < 101; i++)
@@ -110,6 +119,7 @@ namespace AutoSchool.Data
                         Description = $"Description{i}",
                         TeacherId = teacher.UserId
                     };
+                                      
 
                     courses.Add(course);
                     teachers.Add(teacher);
@@ -127,7 +137,31 @@ namespace AutoSchool.Data
                 users.Add(user);    
             }
 
-            Random rnd = new Random();  
+            Random rnd = new Random();
+
+            for (int i = 1; i <= 100; i++)
+            {
+                var x = rnd.Next(1, 10);
+                themes.Add(new Theme()
+                {
+                    Id = i,
+                    Name = $"Course{x} - Theme{i}",
+                    Description = $"Course{x} - Theme{i} description",
+                    CourseId = rnd.Next(1, 10)
+                });
+            }
+
+            for (int i = 1; i <= 1000; i++)
+            {
+                lectures.Add(new Lecture()
+                {
+                    Id = i,
+                    Name = $"Lecture{i}",
+                    Description = $"Description lecture{i}",
+                    TextHTML = "HTML",
+                    ThemeId = rnd.Next(1, 100),
+                });
+            }
 
             foreach (var student in students)
             {
@@ -145,6 +179,8 @@ namespace AutoSchool.Data
             modelBuilder.Entity<Student>().HasData(students);
             modelBuilder.Entity<Course>().HasData(courses);
             modelBuilder.Entity<StudentsCourses>().HasData(studentsCourses);
+            modelBuilder.Entity<Theme>().HasData(themes);
+            modelBuilder.Entity<Lecture>().HasData(lectures);
 
 
             base.OnModelCreating(modelBuilder);

@@ -6,6 +6,7 @@
         public long CourseId { get; set; }
         public string Status { get; set; }
         public double Progress { get; set; }
+        public bool AccessToCourse { get; set; } = true;
 
 
         public Student Student { get; set; }

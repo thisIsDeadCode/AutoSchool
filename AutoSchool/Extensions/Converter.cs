@@ -120,5 +120,18 @@ namespace AutoSchool.Extensions
            
             return themeView;
         }
+
+        public static LectureView ConvertLectureToLectureView(this Lecture lecture)
+        {
+            var lectureView = new LectureView()
+            {
+                Id = lecture.Id,
+                Name = lecture.Name,
+                TextHTML = lecture.TextHTML,
+                Description = lecture.Description,
+            };
+
+            return lectureView;
+        }
     }
 }

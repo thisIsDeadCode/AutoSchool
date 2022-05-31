@@ -8,10 +8,6 @@ namespace AutoSchool.Models.Tables
         public string Name { get; set; }
         public long AmountQuestions { get; set; }
         public string? Description { get; set; }
-
-        public double? LastResult { get; set; }
-        public DateTime? Date { get; set; }
-
         
         public Theme Theme { get; set; }
 

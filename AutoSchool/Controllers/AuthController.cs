@@ -80,6 +80,49 @@ namespace AutoSchool.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost]
+        [Route("Auth/PasswordReset")]
+        public async Task<ActionResult<PasswordResetView>> PasswordReset([FromBody] PasswordResetView passwordReset)
+        {
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            if (user != null)
+            {
+                if(passwordReset.Password != null && passwordReset.Password == passwordReset.ConfirmPassword)
+                {
+                    if(passwordReset.Password.Length > 6)
+                    {
+                        user.Password = passwordReset.Password;
+                        _dbContext.Users.Update(user);
+                        await _dbContext.SaveChangesAsync();
+                        return Ok();
+                    }
+                    else
+                    {
+                        passwordReset.Errors = new List<string>()
+                        {
+                            "Пароль должен быть не меньше 6 символов"
+                        };
+
+                        return passwordReset;
+                    }
+                }
+                else
+                {
+                    passwordReset.Errors = new List<string>()
+                    {
+                        "Пароли не совпадают"
+                    };
+                    return passwordReset;
+                }
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized);
+            }
+        }
+
+
         private async Task Authenticate(string email)
         {
             var claims = new List<Claim>

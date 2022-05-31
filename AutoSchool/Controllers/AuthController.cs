@@ -44,9 +44,7 @@ namespace AutoSchool.Controllers
 
                 return login;
             }
-        }
-
-      
+        }      
 
         [Authorize]
         [HttpGet]
@@ -62,15 +60,8 @@ namespace AutoSchool.Controllers
         public async Task<ActionResult<RegistrationView>> Registration([FromBody] RegistrationView registration)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == registration.Email);
-            if (user == null)
-            {
-                _dbContext.Users.Add(new User { Email = registration.Email, Password = registration.Password, FullName = registration.FullName });
-                await _dbContext.SaveChangesAsync();
 
-                await Authenticate(registration.Email);
-                return Ok();
-            }
-            else
+            if(User != null)
             {
                 registration.Errors = new List<string>()
                 {
@@ -78,6 +69,20 @@ namespace AutoSchool.Controllers
                 };
                 return registration;
             }
+
+            if (IsValidEmail(registration.Email, registration.Errors) && IsValidPassword(registration.Password, registration.Errors))
+            {
+                var userDB =  new User() { Email = registration.Email, Password = registration.Password, FullName = registration.FullName };
+
+                _dbContext.Users.Add(userDB);
+                _dbContext.Students.Add(new Student () { User = userDB});
+                await _dbContext.SaveChangesAsync();
+
+                await Authenticate(registration.Email);
+                return Ok();
+            }
+
+            return registration;
         }
 
         [Authorize]
@@ -88,24 +93,13 @@ namespace AutoSchool.Controllers
             User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
             if (user != null)
             {
-                if(passwordReset.Password != null && passwordReset.Password == passwordReset.ConfirmPassword)
+                if(IsValidPassword(passwordReset.Password, passwordReset.Errors) &&
+                    passwordReset.Password == passwordReset.ConfirmPassword)
                 {
-                    if(passwordReset.Password.Length > 6)
-                    {
-                        user.Password = passwordReset.Password;
-                        _dbContext.Users.Update(user);
-                        await _dbContext.SaveChangesAsync();
-                        return Ok();
-                    }
-                    else
-                    {
-                        passwordReset.Errors = new List<string>()
-                        {
-                            "Пароль должен быть не меньше 6 символов"
-                        };
-
-                        return passwordReset;
-                    }
+                    user.Password = passwordReset.Password;
+                    _dbContext.Users.Update(user);
+                    await _dbContext.SaveChangesAsync();
+                    return Ok();
                 }
                 else
                 {
@@ -122,7 +116,6 @@ namespace AutoSchool.Controllers
             }
         }
 
-
         private async Task Authenticate(string email)
         {
             var claims = new List<Claim>
@@ -131,6 +124,33 @@ namespace AutoSchool.Controllers
             };
             ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+
+        bool IsValidEmail(string email, List<string> errors)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                errors.Add("Введите правильный Email");
+                return false;
+            }
+        }
+
+        bool IsValidPassword(string password, List<string> errors)
+        {
+            if (password != null && password.Length > 6)
+            {
+                return true;
+            }
+            else
+            {
+                errors.Add("Пароль должен быть не меньше 6 символов");
+                return false;
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using AutoSchool.Services;
 namespace AutoSchool.Controllers
 {
     [ApiController]
+    [Authorize]
     public class ThemeController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -50,7 +51,6 @@ namespace AutoSchool.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet]
         [Route("Theme/Get")]
         public async Task<ActionResult<ThemeView>> Get(long Id)

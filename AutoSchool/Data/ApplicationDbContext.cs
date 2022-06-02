@@ -20,6 +20,7 @@ namespace AutoSchool.Data
         public DbSet<ResultTest> ResultTests { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<VisitHistory> VisitHistories { get; set; }
+        public DbSet<QuestionAnswers> QuestionAnswers { get; set; }
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -35,6 +36,7 @@ namespace AutoSchool.Data
             modelBuilder.Entity<File>().HasKey("Id");
             modelBuilder.Entity<Lecture>().HasKey("Id");
             modelBuilder.Entity<Question>().HasKey("Id");
+            modelBuilder.Entity<QuestionAnswers>().HasKey("Id");
             modelBuilder.Entity<Student>().HasKey("UserId");
             modelBuilder.Entity<StudentsCourses>().HasKey("StudentId", "CourseId");
             modelBuilder.Entity<Teacher>().HasKey("UserId");
@@ -59,6 +61,11 @@ namespace AutoSchool.Data
             modelBuilder.Entity<VisitHistory>().HasOne(t => t.Theme).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<VisitHistory>().HasOne(t => t.Lecture).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<VisitHistory>().HasOne(t => t.Test).WithMany(c => c.Visits).OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<QuestionAnswers>().HasOne(t => t.ResultTest).WithMany(c => c.QuestionAnswers).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<QuestionAnswers>().HasOne(t => t.Question).WithMany(c => c.QuestionAnswers).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<QuestionAnswers>().HasOne(t => t.Answer).WithMany(c => c.QuestionAnswers).OnDelete(DeleteBehavior.NoAction);
 
 
             modelBuilder.Entity<ResultTest>()

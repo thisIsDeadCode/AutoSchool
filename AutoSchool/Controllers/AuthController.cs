@@ -61,7 +61,7 @@ namespace AutoSchool.Controllers
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == registration.Email);
 
-            if(User != null)
+            if(user != null)
             {
                 registration.Errors = new List<string>()
                 {

@@ -133,5 +133,17 @@ namespace AutoSchool.Extensions
 
             return lectureView;
         }
+
+        public static QuestionView ConvertQuestionToQuestionView(this Question question)
+        {
+            var questionView = new QuestionView()
+            {
+                Id = question.Id,
+                QuestionImageId = question.QuestionImageId,
+                QuestionText = question.QuestionText,
+            };
+
+            return questionView;
+        }
     }
 }

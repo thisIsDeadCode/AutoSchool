@@ -97,7 +97,7 @@ namespace AutoSchool.Extensions
             var lastResult = theme.Test?.ResultTests?.OrderByDescending(x => x.Date).FirstOrDefault();
 
             var lastRightResult = theme.Test?.ResultTests?
-                                        .Where(x => x.Test.ResultTests.Any(z => z.TestResult == 1))
+                                        .Where(x => x.Test.ResultTests.Any(z => z.Result == 1))
                                         .OrderByDescending(x => x.Date).FirstOrDefault();
 
             if(lastResult == null && lastRightResult == null)

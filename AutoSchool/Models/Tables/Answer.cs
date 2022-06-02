@@ -8,5 +8,6 @@
 
         public long QuestionId { get; set; }
         public Question Question { get; set; }
+        public IEnumerable<QuestionAnswers> QuestionAnswers { get; set; }
     }
 }

@@ -32,15 +32,16 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Test/GetTest")]
-        public async Task<ActionResult<TestView>> GetTest(long testId)
+        public async Task<ActionResult<TestView>> GetTest(long themeId)
         {
+            //themeId == testId
             User? userDb = await _dbContext.Users
                                             .Include(x => x.Student)
                                             .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
             var test = _dbContext.Tests
                                     .Include(x => x.Questions)
-                                    .FirstOrDefault(x => x.Id == testId);
+                                    .FirstOrDefault(x => x.Id == themeId);
 
             if (test == null)
             {
@@ -59,8 +60,9 @@ namespace AutoSchool.Controllers
 
         [HttpPost]
         [Route("Test/SendResult")]
-        public async Task<ActionResult<ResultTestView>> SendResult(long testId, [FromBody] List<AnswersToQuestionView> answersToQuestionViews)
+        public async Task<ActionResult<ResultTestView>> SendResult(long themeId, [FromBody] List<AnswersToQuestionView> answersToQuestionViews)
         {
+            //themeId == testId
             User? userDb = await _dbContext.Users
                                             .Include(x => x.Student)
                                             .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
@@ -68,7 +70,7 @@ namespace AutoSchool.Controllers
             var test = _dbContext.Tests
                                 .Include(x => x.Questions)
                                 .ThenInclude(x => x.Answers)
-                                .FirstOrDefault(x => x.Id == testId);
+                                .FirstOrDefault(x => x.Id == themeId);
 
 
             if (test == null)
@@ -87,11 +89,12 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Test/GetTestResult")]
-        public async Task<ActionResult<ResultTestView>> GetTestResult(long testId)
+        public async Task<ActionResult<ResultTestView>> GetTestResult(long themeId)
         {
+            //themeId == testId
             var test = _dbContext.Tests
                                 .Include(x => x.ResultTests)
-                                .FirstOrDefault(x => x.Id == testId);
+                                .FirstOrDefault(x => x.Id == themeId);
 
             User? userDb = await _dbContext.Users
                                             .Include(x => x.Student)

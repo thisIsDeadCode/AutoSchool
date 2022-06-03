@@ -145,5 +145,20 @@ namespace AutoSchool.Extensions
 
             return questionView;
         }
+
+        public static ResultTestView ConvertResultTestToResultTestViewView(this ResultTest resultTest)
+        {
+            var resultTestView = new ResultTestView()
+            {
+                Id = resultTest.Id,
+                AmountRightQuestions = resultTest.AmountRightQuestions,
+                AmountWrongQuestions = resultTest.AmountWrongQuestions,
+                Date = resultTest.Date,
+                Result = resultTest.Result,
+                Status = resultTest.Status,
+            };
+
+            return resultTestView;
+        }
     }
 }

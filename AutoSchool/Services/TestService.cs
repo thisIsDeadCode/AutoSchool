@@ -16,17 +16,8 @@ namespace AutoSchool.Services
             _dbContext = dbContext;
         }
 
-        public async Task<TestView> GenerateTest(long testId)
+        public async Task<TestView> GenerateTest(Test test)
         {
-            var test =  _dbContext.Tests
-                                    .Include(x => x.Questions)     
-                                    .FirstOrDefault(x => x.Id == testId);
-
-            if (test == null)
-            {
-                return null;
-            }
-
             List<QuestionView> questionsView = new List<QuestionView>();
 
             if (test.AmountQuestions >= test.Questions.Count())
@@ -51,7 +42,7 @@ namespace AutoSchool.Services
 
             var testView = new TestView()
             {
-                Id = testId,
+                Id = test.Id,
                 Name = test.Name,
                 Description = test.Description,
                 Questions = questionsView

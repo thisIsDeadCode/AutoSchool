@@ -60,21 +60,10 @@ namespace AutoSchool.Services
             return testView;
         }
 
-        public async Task<ResultTestView> CheckTestResults(long testId, long userId, List<AnswersToQuestionView> answersToQuestionView)
+        public async Task<ResultTestView> CheckTestResults(Test test, long userId, List<AnswersToQuestionView> answersToQuestionView)
         {
             var resultTestView = new ResultTestView();
             resultTestView.Errors = new List<string>();
-
-            var test = _dbContext.Tests
-                                .Include(x => x.Questions)
-                                .ThenInclude(x => x.Answers)
-                                .FirstOrDefault(x => x.Id == testId);
-
-            if (test == null)
-            {
-                resultTestView.Errors.Add("Ошибка, теста не существует");
-                return resultTestView;
-            }
 
             var questions = test.Questions.ToList();
 
@@ -151,7 +140,7 @@ namespace AutoSchool.Services
                 resultTest.Result = result;
                 resultTest.Date = DateTime.Now;
                 resultTest.StudentUserId = userId;
-                resultTest.TestId = testId;
+                resultTest.TestId = test.Id;
                 resultTest.QuestionAnswers = questionAnswers;
 
                 _dbContext.ResultTests.Add(resultTest);

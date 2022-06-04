@@ -27,7 +27,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Button/GetHrefForButtons")]
-        public async Task<ActionResult<LinksLeftMenuView>> GetHrefForButtons()
+        public async Task<ActionResult<LinksLeftMenuResponse>> GetHrefForButtons()
         {
             User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 

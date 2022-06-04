@@ -26,7 +26,7 @@ namespace AutoSchool.Controllers
 
         [HttpPost]
         [Route("Auth/Login")]
-        public async Task<ActionResult<LoginView>> Login([FromBody] LoginView login)
+        public async Task<ActionResult<Response>> Login([FromBody] LoginRequest login)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == login.Email && u.Password == login.Password);
 
@@ -37,40 +37,39 @@ namespace AutoSchool.Controllers
             }
             else
             {
-                login.Errors = new List<string>()
-                    {
-                        "Неверный логин или пароль"
-                    };
+                var response = new Response()
+                {
+                    Errors = new List<string> { "Неверный логин или пароль" }
+                };
 
-                return login;
+                return response;
             }
         }      
 
         [Authorize]
         [HttpGet]
         [Route("Auth/Logout")]
-        public async Task<ActionResult<ResponseView>> Logout()
+        public async Task<ActionResult<Response>> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return new ResponseView();
+            return Ok();
         }
 
         [HttpPost]
         [Route("Auth/Registration")]
-        public async Task<ActionResult<RegistrationView>> Registration([FromBody] RegistrationView registration)
+        public async Task<ActionResult<Response>> Registration([FromBody] RegistrationRequest registration)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == registration.Email);
+            var response = new Response();
 
-            if(user != null)
+            if (user != null)
             {
-                registration.Errors = new List<string>()
-                {
-                    "Такой пользователь уже существует"
-                };
-                return registration;
+                response.Errors = new List<string> { "Такой пользователь уже существует" };
+
+                return response;
             }
 
-            if (IsValidEmail(registration.Email, registration.Errors) && IsValidPassword(registration.Password, registration.Errors))
+            if (IsValidEmail(registration.Email, response.Errors) && IsValidPassword(registration.Password, response.Errors))
             {
                 var userDB =  new User() { Email = registration.Email, Password = registration.Password, FullName = registration.FullName };
 
@@ -82,18 +81,20 @@ namespace AutoSchool.Controllers
                 return Ok();
             }
 
-            return registration;
+            return response;
         }
 
         [Authorize]
         [HttpPost]
         [Route("Auth/PasswordReset")]
-        public async Task<ActionResult<PasswordResetView>> PasswordReset([FromBody] PasswordResetView passwordReset)
+        public async Task<ActionResult<Response>> PasswordReset([FromBody] PasswordResetRequest passwordReset)
         {
             User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var response = new Response();
+
             if (user != null)
             {
-                if(IsValidPassword(passwordReset.Password, passwordReset.Errors) &&
+                if(IsValidPassword(passwordReset.Password, response.Errors) &&
                     passwordReset.Password == passwordReset.ConfirmPassword)
                 {
                     user.Password = passwordReset.Password;
@@ -103,11 +104,9 @@ namespace AutoSchool.Controllers
                 }
                 else
                 {
-                    passwordReset.Errors = new List<string>()
-                    {
-                        "Пароли не совпадают"
-                    };
-                    return passwordReset;
+                    response.Errors = new List<string> { "Пароли не совпадают" };
+
+                    return response;
                 }
             }
             else

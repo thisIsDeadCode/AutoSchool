@@ -1,6 +1,6 @@
 ﻿namespace AutoSchool.Models.Views
 {
-    public class AnswerView
+    public class AnswerRequest
     {
         public long AnswerId { get; set; }
         public string TextAnswer { get; set; }

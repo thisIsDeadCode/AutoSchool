@@ -1,6 +1,6 @@
 ﻿namespace AutoSchool.Models.Views
 {
-    public class QuestionView
+    public class QuestionResponse
     {
         public long Id { get; set; }
         public long QuestionImageId { get; set; }

@@ -1,19 +1,19 @@
 ﻿using AutoSchool.Models.Tables;
 using AutoSchool.Models.Views;
-using static AutoSchool.Models.Views.LinksLeftMenuView;
+using static AutoSchool.Models.Views.LinksLeftMenuResponse;
 
 namespace AutoSchool.Extensions
 {
     public static class Converter
     {
-        public static CourseView ConvertCourseToCourseView(this Course course)
+        public static CourseResponse ConvertCourseToCourseView(this Course course)
         {
-            var courseView = new CourseView()
+            var courseView = new CourseResponse()
             {
                 Id = course.Id,
                 Name = course.Name,
                 Progress = 0,
-                Teacher = new TeacherView()
+                Teacher = new TeacherResponse()
                 {
                     Id = course.Teacher.UserId,
                     UserName = course.Teacher.User.UserName,
@@ -28,7 +28,7 @@ namespace AutoSchool.Extensions
                     UserNameTwitter = course.Teacher.User.UserNameTwitter,
                 },
                 Description = course.Description,
-                Students = course.StudentsCoursies.Select(s => new StudentView()
+                Students = course.StudentsCoursies.Select(s => new StudentResponse()
                 {
                     Id = s.Student.UserId,
                     UserName = s.Student.User.UserName,
@@ -47,9 +47,9 @@ namespace AutoSchool.Extensions
             return courseView;
         }
 
-        public static LinksLeftMenuView ConvertVisitHistoriesToLinksLeftMenu(this IEnumerable<VisitHistory> visitHistories)
+        public static LinksLeftMenuResponse ConvertVisitHistoriesToLinksLeftMenu(this IEnumerable<VisitHistory> visitHistories)
         {
-            var linksLeftMenuView = new LinksLeftMenuView();
+            var linksLeftMenuView = new LinksLeftMenuResponse();
 
             var courses = visitHistories.Where(x => x.CourseId != null).ToList();
             var themes = visitHistories.Where(x => x.ThemeId != null).ToList();
@@ -84,9 +84,9 @@ namespace AutoSchool.Extensions
             return linksLeftMenuView;
         }
 
-        public static ThemeView ConvertThemeToThemeView(this Theme theme)
+        public static ThemeResponse ConvertThemeToThemeView(this Theme theme)
         {
-            var themeView = new ThemeView()
+            var themeView = new ThemeResponse()
             {
                 Id = theme.Id,
                 Name = theme.Name,
@@ -121,9 +121,9 @@ namespace AutoSchool.Extensions
             return themeView;
         }
 
-        public static LectureView ConvertLectureToLectureView(this Lecture lecture)
+        public static LectureResponse ConvertLectureToLectureView(this Lecture lecture)
         {
-            var lectureView = new LectureView()
+            var lectureView = new LectureResponse()
             {
                 Id = lecture.Id,
                 Name = lecture.Name,
@@ -134,9 +134,9 @@ namespace AutoSchool.Extensions
             return lectureView;
         }
 
-        public static QuestionView ConvertQuestionToQuestionView(this Question question)
+        public static QuestionResponse ConvertQuestionToQuestionView(this Question question)
         {
-            var questionView = new QuestionView()
+            var questionView = new QuestionResponse()
             {
                 Id = question.Id,
                 QuestionImageId = question.QuestionImageId,
@@ -146,9 +146,9 @@ namespace AutoSchool.Extensions
             return questionView;
         }
 
-        public static ResultTestView ConvertResultTestToResultTestViewView(this ResultTest resultTest)
+        public static ResultTestResponse ConvertResultTestToResultTestViewView(this ResultTest resultTest)
         {
-            var resultTestView = new ResultTestView()
+            var resultTestView = new ResultTestResponse()
             {
                 Id = resultTest.Id,
                 AmountRightQuestions = resultTest.AmountRightQuestions,

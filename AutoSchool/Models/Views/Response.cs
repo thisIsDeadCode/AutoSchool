@@ -1,6 +1,6 @@
 ﻿namespace AutoSchool.Models.Views
 {
-    public class ResponseView
+    public class Response
     {
         public List<string> Errors { get; set; }
     }

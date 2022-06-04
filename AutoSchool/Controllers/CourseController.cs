@@ -27,7 +27,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Course/GetAllCourses")]
-        public async Task<ActionResult<IEnumerable<CourseView>>> GetAllCourses()
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetAllCourses()
         {
             var courses = _dbContext.Courses
                 .Include(t => t.Teacher)
@@ -37,7 +37,7 @@ namespace AutoSchool.Controllers
                         .ThenInclude(s => s.User)
                 .ToList();
 
-            var coursesView = new List<CourseView>();
+            var coursesView = new List<CourseResponse>();
 
             foreach (var course in courses)
             {
@@ -57,7 +57,7 @@ namespace AutoSchool.Controllers
         [Authorize]
         [HttpGet]
         [Route("Course/Get")]
-        public async Task<ActionResult<CourseView>> Get(long Id)
+        public async Task<ActionResult<CourseResponse>> Get(long Id)
         {
             Course? course = await _dbContext.Courses
                                              .Include(t => t.Teacher)
@@ -71,7 +71,7 @@ namespace AutoSchool.Controllers
 
             if (course != null && userDb != null)
             {
-                CourseView courseView = course.ConvertCourseToCourseView();
+                CourseResponse courseView = course.ConvertCourseToCourseView();
                 courseView.LoadProgressToCourse(_dbContext, userDb.Id);
 
                 await _historyService.SaveTohistory(userDb, course);

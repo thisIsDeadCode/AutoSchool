@@ -28,7 +28,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Theme/GetAllThemes")]
-        public async Task<ActionResult<IEnumerable<ThemeView>>> GetAllThemes(long courseId)
+        public async Task<ActionResult<IEnumerable<ThemeResponse>>> GetAllThemes(long courseId)
         {
             Course? course =  await  _dbContext.Courses
                                     .Include(c => c.Themes)
@@ -36,7 +36,7 @@ namespace AutoSchool.Controllers
                                     .FirstOrDefaultAsync(x=>x.Id == courseId); 
             if(course != null)
             {
-                var themes = new List<ThemeView>();
+                var themes = new List<ThemeResponse>();
 
                 foreach (var theme in course.Themes)
                 {                    
@@ -53,7 +53,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Theme/Get")]
-        public async Task<ActionResult<ThemeView>> Get(long Id)
+        public async Task<ActionResult<ThemeResponse>> Get(long Id)
         {
             Theme? theme = await _dbContext.Themes
                                               .Include(c => c.Test)   
@@ -65,7 +65,7 @@ namespace AutoSchool.Controllers
 
             if (theme != null && userDb != null)
             {
-                ThemeView themeView = theme.ConvertThemeToThemeView();
+                ThemeResponse themeView = theme.ConvertThemeToThemeView();
 
                 await _historyService.SaveTohistory(userDb, theme);
 

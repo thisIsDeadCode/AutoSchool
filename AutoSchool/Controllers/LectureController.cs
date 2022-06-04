@@ -28,14 +28,14 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Lecture/GetAllLectures")]
-        public async Task<ActionResult<IEnumerable<LectureView>>> GetAllLecture(long themeId)
+        public async Task<ActionResult<IEnumerable<LectureResponse>>> GetAllLecture(long themeId)
         {
             Theme? theme =  await  _dbContext.Themes
                                     .Include(c => c.Lectures)
                                     .FirstOrDefaultAsync(x=>x.Id == themeId); 
             if(theme != null)
             {
-                var lectures = new List<LectureView>();
+                var lectures = new List<LectureResponse>();
 
                 foreach (var lecture in theme.Lectures)
                 {
@@ -52,7 +52,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Lecture/Get")]
-        public async Task<ActionResult<LectureView>> Get(long Id)
+        public async Task<ActionResult<LectureResponse>> Get(long Id)
         {
             Lecture? lecture = await _dbContext.Lectures.FirstOrDefaultAsync(x => x.Id == Id);
 
@@ -60,7 +60,7 @@ namespace AutoSchool.Controllers
 
             if (lecture != null && userDb != null)
             {
-                LectureView lectureView = lecture.ConvertLectureToLectureView();
+                LectureResponse lectureView = lecture.ConvertLectureToLectureView();
 
                 await _historyService.SaveTohistory(userDb, lecture);
 

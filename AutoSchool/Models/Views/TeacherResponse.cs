@@ -1,6 +1,6 @@
 ﻿namespace AutoSchool.Models.Views
 {
-    public class StudentView : UserView
+    public class TeacherResponse : UserResponse
     {
     }
 }

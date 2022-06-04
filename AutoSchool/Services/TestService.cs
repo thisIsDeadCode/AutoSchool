@@ -16,9 +16,9 @@ namespace AutoSchool.Services
             _dbContext = dbContext;
         }
 
-        public async Task<TestView> GenerateTest(Test test)
+        public async Task<TestResponse> GenerateTest(Test test)
         {
-            List<QuestionView> questionsView = new List<QuestionView>();
+            List<QuestionResponse> questionsView = new List<QuestionResponse>();
 
             if (test.AmountQuestions >= test.Questions.Count())
             {
@@ -40,7 +40,7 @@ namespace AutoSchool.Services
                 }
             }
 
-            var testView = new TestView()
+            var testView = new TestResponse()
             {
                 Id = test.Id,
                 Name = test.Name,
@@ -51,9 +51,9 @@ namespace AutoSchool.Services
             return testView;
         }
 
-        public async Task<ResultTestView> CheckTestResults(Test test, long userId, List<AnswersToQuestionView> answersToQuestionView)
+        public async Task<ResultTestResponse> CheckTestResults(Test test, long userId, List<AnswersToQuestionRequest> answersToQuestionView)
         {
-            var resultTestView = new ResultTestView();
+            var resultTestView = new ResultTestResponse();
             resultTestView.Errors = new List<string>();
 
             var questions = test.Questions.ToList();

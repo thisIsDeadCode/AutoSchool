@@ -32,7 +32,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Test/GetTest")]
-        public async Task<ActionResult<TestView>> GetTest(long themeId)
+        public async Task<ActionResult<TestResponse>> GetTest(long themeId)
         {
             //themeId == testId
             User? userDb = await _dbContext.Users
@@ -60,7 +60,7 @@ namespace AutoSchool.Controllers
 
         [HttpPost]
         [Route("Test/SendResult")]
-        public async Task<ActionResult<ResultTestView>> SendResult(long themeId, [FromBody] List<AnswersToQuestionView> answersToQuestionViews)
+        public async Task<ActionResult<ResultTestResponse>> SendResult(long themeId, [FromBody] List<AnswersToQuestionRequest> answersToQuestionViews)
         {
             //themeId == testId
             User? userDb = await _dbContext.Users
@@ -89,7 +89,7 @@ namespace AutoSchool.Controllers
 
         [HttpGet]
         [Route("Test/GetTestResult")]
-        public async Task<ActionResult<ResultTestView>> GetTestResult(long themeId)
+        public async Task<ActionResult<ResultTestResponse>> GetTestResult(long themeId)
         {
             //themeId == testId
             var test = _dbContext.Tests

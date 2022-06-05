@@ -8,5 +8,6 @@
         public string Status { get; set; }
         public long AmountLecture { get; set; }
         public DateTime? TestDate { get; set; }
+        public bool IsActiveButtonLastResultTest { get; set; }
     }
 }

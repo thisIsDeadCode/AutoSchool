@@ -103,6 +103,7 @@ namespace AutoSchool.Extensions
             if(lastResult == null && lastRightResult == null)
             {
                 themeView.Status = "Тест не начат";
+                themeView.IsActiveButtonLastResultTest = false;
             }
             else
             {
@@ -116,6 +117,7 @@ namespace AutoSchool.Extensions
                     themeView.Status = "Тест пройден";
                     themeView.TestDate = lastRightResult.Date;
                 }
+                themeView.IsActiveButtonLastResultTest = true;
             }
            
             return themeView;

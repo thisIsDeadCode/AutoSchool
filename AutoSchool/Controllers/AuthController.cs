@@ -1,11 +1,12 @@
 ﻿using AutoSchool.Data;
+using AutoSchool.Extensions;
 using AutoSchool.Models.Tables;
 using AutoSchool.Models.Views;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace AutoSchool.Controllers
@@ -16,28 +17,29 @@ namespace AutoSchool.Controllers
 
         private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _dbContext;
+        private readonly IConfiguration _configuration;
 
         public AuthController(ILogger<UserController> logger,
-            ApplicationDbContext dbContext)
+            ApplicationDbContext dbContext, IConfiguration configuration)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _configuration = configuration;
         }
 
         [HttpPost]
         [Route("Auth/Login")]
-        public async Task<ActionResult<Response>> Login([FromBody] LoginRequest login)
+        public async Task<ActionResult<AuthenticateResponse>> Login([FromBody] LoginRequest login)
         {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == login.Email && u.Password == login.Password);
+            var response = Authenticate(login.Email, login.Password);
 
-            if (user != null)
+            if (response != null)
             {
-                await Authenticate(login.Email); 
-                return Ok();
+                return response;
             }
             else
             {
-                var response = new Response()
+                response = new AuthenticateResponse()
                 {
                     Errors = new List<string> { "Неверный логин или пароль" }
                 };
@@ -46,30 +48,18 @@ namespace AutoSchool.Controllers
             }
         }      
 
-        [Authorize]
-        [HttpGet]
-        [Route("Auth/Logout")]
-        public async Task<ActionResult<Response>> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok();
-        }
-
         [HttpPost]
         [Route("Auth/Registration")]
         public async Task<ActionResult<Response>> Registration([FromBody] RegistrationRequest registration)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == registration.Email);
-            var response = new Response();
+            AuthenticateResponse response = new AuthenticateResponse();
 
             if (user != null)
             {
                 response.Errors = new List<string> { "Такой пользователь уже существует" };
-
-                return response;
             }
-
-            if (IsValidEmail(registration.Email, response.Errors) && IsValidPassword(registration.Password, response.Errors))
+            else if (IsValidEmail(registration.Email, response.Errors) && IsValidPassword(registration.Password, response.Errors))
             {
                 var userDB =  new User() { Email = registration.Email, Password = registration.Password, FullName = registration.FullName };
 
@@ -77,8 +67,7 @@ namespace AutoSchool.Controllers
                 _dbContext.Students.Add(new Student () { User = userDB});
                 await _dbContext.SaveChangesAsync();
 
-                await Authenticate(registration.Email);
-                return Ok();
+                response = Authenticate(registration.Email, registration.Password);
             }
 
             return response;
@@ -115,14 +104,47 @@ namespace AutoSchool.Controllers
             }
         }
 
-        private async Task Authenticate(string email)
+        private AuthenticateResponse Authenticate(string email, string password)
         {
-            var claims = new List<Claim>
+            var identity = GetIdentity(email, password);
+
+            var now = DateTime.UtcNow;
+
+            var jwt = new JwtSecurityToken(
+                    issuer: AuthOptions.ISSUER,
+                    audience: AuthOptions.AUDIENCE,
+                    notBefore: now,
+                    claims: identity.Claims,
+                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+            var response = new AuthenticateResponse()
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, email)
+                Token = encodedJwt,
+                Email = identity.Name
             };
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+
+            return response;
+        }
+
+        private ClaimsIdentity GetIdentity(string email, string password)
+        {
+            User user = _dbContext.Users.FirstOrDefault(x => x.Email == email && x.Password == password);
+            if (user != null)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
+                    //new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role)
+                };
+                ClaimsIdentity claimsIdentity =
+                new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
+                    ClaimsIdentity.DefaultRoleClaimType);
+                return claimsIdentity;
+            }
+
+            return null;
         }
 
         bool IsValidEmail(string email, List<string> errors)
@@ -141,7 +163,7 @@ namespace AutoSchool.Controllers
 
         bool IsValidPassword(string password, List<string> errors)
         {
-            if (password != null && password.Length > 6)
+            if (password != null && password.Length >= 6)
             {
                 return true;
             }

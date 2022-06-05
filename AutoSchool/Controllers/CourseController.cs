@@ -83,5 +83,68 @@ namespace AutoSchool.Controllers
                 return StatusCode(404);
             }
         }
+
+        [Authorize]
+        [HttpGet]
+        [Route("Course/GetCoursesByStatus")]
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCoursesByStatus(string status)
+        {
+            List<CourseResponse> result = new List<CourseResponse>();
+
+            if (status == "ongoing")
+            {
+                result = await GetCourses(true);
+            }
+            else if(status == "finished")
+            {
+                result = await GetCourses(false, true);
+            }
+            else
+            {
+                return BadRequest();
+            }
+            return result;
+        }
+
+        private async Task<List<CourseResponse>> GetCourses(bool ongoing = false, bool finished = false)
+        {
+            User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            List<CourseResponse> result = new List<CourseResponse>();
+
+            if (userDb != null)
+            {
+                var courses = _dbContext.Courses
+                .Include(t => t.Teacher)
+                    .ThenInclude(u => u.User)
+                .Include(st => st.StudentsCoursies.Take(5))
+                    .ThenInclude(stc => stc.Student)
+                        .ThenInclude(s => s.User)
+                .ToList();
+
+                var coursesView = new List<CourseResponse>();
+
+                foreach (var course in courses)
+                {
+                    coursesView.Add(course.ConvertCourseToCourseView());
+                }
+
+                coursesView.LoadProgressToCourses(_dbContext, userDb.Id);
+
+
+                if(ongoing == true && finished == false)
+                {
+                    result = coursesView.Where(x => x.Progress > 0).ToList();
+                }
+                else if(ongoing == false && finished == true)
+                {
+                    result = coursesView.Where(x => x.Progress == 0).ToList();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return result;
+        }
     }
 }

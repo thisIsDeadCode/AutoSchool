@@ -8,11 +8,19 @@ namespace AutoSchool.Extensions
     {
         public static CourseResponse ConvertCourseToCourseView(this Course course)
         {
+            long amountLecture = 0;
+            foreach(var theme in course.Themes)
+            {
+                amountLecture += theme.Lectures.Count();
+            }
+
             var courseView = new CourseResponse()
             {
                 Id = course.Id,
                 Name = course.Name,
                 Progress = 0,
+                AmountLecture = amountLecture,
+                AmountThemes = course.Themes.Count(),
                 Teacher = new TeacherResponse()
                 {
                     Id = course.Teacher.UserId,

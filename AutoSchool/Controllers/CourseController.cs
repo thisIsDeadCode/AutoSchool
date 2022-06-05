@@ -35,6 +35,8 @@ namespace AutoSchool.Controllers
                 .Include(st => st.StudentsCoursies.Take(5))
                     .ThenInclude(stc => stc.Student)
                         .ThenInclude(s => s.User)
+                 .Include(x => x.Themes)
+                    .ThenInclude(y => y.Lectures)
                 .ToList();
 
             var coursesView = new List<CourseResponse>();
@@ -65,6 +67,8 @@ namespace AutoSchool.Controllers
                                               .Include(st => st.StudentsCoursies)
                                                 .ThenInclude(stc => stc.Student)
                                                   .ThenInclude(s => s.User)
+                                              .Include(x => x.Themes)
+                                                 .ThenInclude(y => y.Lectures)
                                               .FirstOrDefaultAsync(x=> x.Id == Id);
 
             User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
@@ -119,6 +123,8 @@ namespace AutoSchool.Controllers
                 .Include(st => st.StudentsCoursies.Take(5))
                     .ThenInclude(stc => stc.Student)
                         .ThenInclude(s => s.User)
+                .Include(x => x.Themes)
+                    .ThenInclude(y => y.Lectures)
                 .ToList();
 
                 var coursesView = new List<CourseResponse>();
@@ -137,7 +143,7 @@ namespace AutoSchool.Controllers
                 }
                 else if(ongoing == false && finished == true)
                 {
-                    result = coursesView.Where(x => x.Progress == 0).ToList();
+                    result = coursesView.Where(x => x.Progress == 1).ToList();
                 }
                 else
                 {

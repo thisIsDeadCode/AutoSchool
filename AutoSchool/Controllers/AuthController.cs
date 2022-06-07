@@ -50,7 +50,7 @@ namespace AutoSchool.Controllers
 
         [HttpPost]
         [Route("Auth/Registration")]
-        public async Task<ActionResult<Response>> Registration([FromBody] RegistrationRequest registration)
+        public async Task<ActionResult<AuthenticateResponse>> Registration([FromBody] RegistrationRequest registration)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == registration.Email);
             AuthenticateResponse response = new AuthenticateResponse();
@@ -84,6 +84,37 @@ namespace AutoSchool.Controllers
             if (user != null)
             {
                 if(IsValidPassword(passwordReset.Password, response.Errors) &&
+                    passwordReset.Password == passwordReset.ConfirmPassword)
+                {
+                    user.Password = passwordReset.Password;
+                    _dbContext.Users.Update(user);
+                    await _dbContext.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    response.Errors = new List<string> { "Пароли не совпадают" };
+
+                    return response;
+                }
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("Auth/RefreshToken")]
+        public async Task<ActionResult<Response>> RefreshToken([FromBody] PasswordResetRequest passwordReset)
+        {
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var response = new Response();
+
+            if (user != null)
+            {
+                if (IsValidPassword(passwordReset.Password, response.Errors) &&
                     passwordReset.Password == passwordReset.ConfirmPassword)
                 {
                     user.Password = passwordReset.Password;

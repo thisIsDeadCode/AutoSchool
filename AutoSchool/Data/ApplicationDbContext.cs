@@ -97,6 +97,9 @@ namespace AutoSchool.Data
             var studentsCourses = new List<StudentsCourses>();
             var themes = new List<Theme>();
             var lectures = new List<Lecture>();
+            var tests = new List<Test>();
+            var questions = new List<Question>();
+            var answers = new List<Answer>();
 
 
             for (int i = 1; i < 101; i++)
@@ -144,6 +147,192 @@ namespace AutoSchool.Data
                 users.Add(user);    
             }
 
+            courses.Add(new Course
+            {
+                Id = 11,
+                Name = $"Первозка опасных грузов",
+                Description = $"Первозка опасных грузов автомобильным транспортом в области международных авто-перевозок",
+                TeacherId = 1
+            });
+
+            themes.Add(new Theme()
+            {
+                Id = 5000,
+                Name = $"Классификация опасных грузов",
+                CourseId = 11
+            });
+            themes.Add(new Theme()
+            {
+                Id = 5001,
+                Name = $"Грузы повышенной опасности и разрешительная система при их перевозках",
+                CourseId = 11
+            }); 
+            themes.Add(new Theme()
+            {
+                Id = 5002,
+                Name = $"Маркировка изделий и упаковок с опасными грузами",
+                CourseId = 11
+            });
+            lectures.Add(new Lecture()
+            {
+                Id = 10000,
+                Name = $"2 Классификация",
+                TextHTML = "В соответствии с ДОПОГ предусматриваются следующие классы опасных грузов:\n" +
+                "1 Класс 1 Взрывчатые вещества и изделия\n" +
+                "2 Класс 2 Газы\n" +
+                "3 Класс 3 Легковоспламеняющиеся жидкости\n" +
+                "4 Класс 4.1 Легковоспламеняющиеся твердые вещества, самореактивные вещества и твердые десенсибилизированные взрывчатые вещества\n" +
+                "5 Класс 4.2 Вещества, способные к самовозгоранию\n" +
+                "6 Класс 4.3 Вещества,выделяющие легковоспламеняющиеся газы при соприкосновении с водой\n" +
+                "7 Класс 5.1 Окисляющие вещества\n" +
+                "8 Класс 5.2 Органические пероксиды\n" +
+                "9 Класс 6.1 Токсичные вещества\n" +
+                "10Класс 6.2 Инфекционные вещества\n" +
+                "11Класс 7 Радиоактивные материалы\n" +
+                "12Класс 8 Коррозионные вещества\n" +
+                "13Класс 9 Прочие опасные вещества и изделия\n",
+                ThemeId = 5000,
+            });
+            lectures.Add(new Lecture()
+            {
+                Id = 10001,
+                Name = $"6 Грузы повышенной опасности",
+                TextHTML = "Грузы повышенной опасности." +
+                "Грузы повышенной опасности являются грузы, которые могут быть использованы не поназначению," +
+                "а в террористических целях, и, следовательно, привести к серьезным последствиям, таким как многочисленные людские потери," +
+                "массовые разрушения или, массовые социальноэкономические потрясения",
+                ThemeId = 5001,
+            });
+            lectures.Add(new Lecture()
+            {
+                Id = 10002,
+                Name = $"10 Маркировка автомобилей\n",
+                TextHTML = "Маркировка транспортных единиц.\n" +
+                "Маркировка табличками оранжевого цвета" +
+                "Транспортные единицы, перевозящие опасные грузы, должны иметь две расположенные в " +
+                "вертикальной плоскости прямоугольные таблички оранжевого цвета.Одна из этих табличек должна крепиться спереди," +
+                "а другая – сзади транспортной единицы, причем обе – перпендикулярно продольной оси транспортной единицы.Они должны быть хорошо видны.",
+                ThemeId = 5002,
+            });
+
+            tests.Add(new Test()
+            {
+                Id = 5000,
+                Name = "Классификация опасных грузов",
+                Description = null,
+                AmountQuestions = 3,
+            });
+
+            questions.Add(new Question()
+            {
+                Id = 1,
+                QuestionImageId = null,
+                QuestionText = "К какому классу опасных грузов в соответствии с ДОПОГ относятся взрывчатые вещества и изделия, которые содержат такие вещества?",
+                TestId = 5000,
+            });
+            questions.Add(new Question()
+            {
+                Id = 2,
+                QuestionImageId = null,
+                QuestionText = "К какому классу опасных грузов в соответствии с ДОПОГ относятся пиротехнические вещества?",
+                TestId = 5000,
+            });
+            questions.Add(new Question()
+            {
+                Id = 3,
+                QuestionImageId = null,
+                QuestionText = "К какому классу опасных грузов в соответствии с ДОПОГ относятся пиротехнические изделия?",
+                TestId = 5000,
+            });
+
+            answers.Add(new Answer()
+            {
+                Id = 1,
+                IsRight = false,
+                QuestionId = 1,
+                TextAnswer = "1. К классу 4.1.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 2,
+                IsRight = true,
+                QuestionId = 1,
+                TextAnswer = "2. К классу 1.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 3,
+                IsRight = false,
+                QuestionId = 1,
+                TextAnswer = "3. К классу 3.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 4,
+                IsRight = false,
+                QuestionId = 1,
+                TextAnswer = "4. К классу 2.",
+            });
+
+            answers.Add(new Answer()
+            {
+                Id = 5,
+                IsRight = false,
+                QuestionId = 2,
+                TextAnswer = "1. К классу 4.1",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 6,
+                IsRight = true,
+                QuestionId = 2,
+                TextAnswer = "2. К классу 1.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 7,
+                IsRight = false,
+                QuestionId = 2,
+                TextAnswer = "3. К классу 5.2.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 8,
+                IsRight = false,
+                QuestionId = 2,
+                TextAnswer = "4. К классу 2.",
+            });
+
+            answers.Add(new Answer()
+            {
+                Id = 9,
+                IsRight = false,
+                QuestionId = 3,
+                TextAnswer = "1. К классу 4.1",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 10,
+                IsRight = true,
+                QuestionId = 3,
+                TextAnswer = "2. К классу 1.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 11,
+                IsRight = false,
+                QuestionId = 3,
+                TextAnswer = "3. К классу 5.2.",
+            });
+            answers.Add(new Answer()
+            {
+                Id = 12,
+                IsRight = false,
+                QuestionId = 3,
+                TextAnswer = "4. К классу 2.",
+            });
+
+
             Random rnd = new Random();
 
             for (int i = 1; i <= 100; i++)
@@ -188,6 +377,11 @@ namespace AutoSchool.Data
             modelBuilder.Entity<StudentsCourses>().HasData(studentsCourses);
             modelBuilder.Entity<Theme>().HasData(themes);
             modelBuilder.Entity<Lecture>().HasData(lectures);
+            modelBuilder.Entity<Test>().HasData(tests);
+            modelBuilder.Entity<Question>().HasData(questions);
+            modelBuilder.Entity<Answer>().HasData(answers);
+
+
 
 
             base.OnModelCreating(modelBuilder);

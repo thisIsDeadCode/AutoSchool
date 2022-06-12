@@ -151,7 +151,17 @@ namespace AutoSchool.Extensions
                 Id = question.Id,
                 QuestionImageId = question.QuestionImageId,
                 QuestionText = question.QuestionText,
+                Answers = new List<AnswerResponce>()
             };
+
+            foreach (var answer in question.Answers)
+            {
+                questionView.Answers.Add(new AnswerResponce()
+                {
+                    AnswerId = answer.Id,
+                    TextAnswer = answer.TextAnswer,
+                });
+            }
 
             return questionView;
         }
@@ -164,7 +174,7 @@ namespace AutoSchool.Extensions
                 AmountRightQuestions = resultTest.AmountRightQuestions,
                 AmountWrongQuestions = resultTest.AmountWrongQuestions,
                 Date = resultTest.Date,
-                Result = resultTest.Result,
+                Result = resultTest.Result * 100,
                 Status = resultTest.Status,
             };
 

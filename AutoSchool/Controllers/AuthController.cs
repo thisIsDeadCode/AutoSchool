@@ -46,7 +46,7 @@ namespace AutoSchool.Controllers
 
                 return response;
             }
-        }      
+        }
 
         [HttpPost]
         [Route("Auth/Registration")]
@@ -61,10 +61,10 @@ namespace AutoSchool.Controllers
             }
             else if (IsValidEmail(registration.Email, response.Errors) && IsValidPassword(registration.Password, response.Errors))
             {
-                var userDB =  new User() { Email = registration.Email, Password = registration.Password, FullName = registration.FullName };
+                var userDB = new User() { Email = registration.Email, Password = registration.Password, FullName = registration.FullName };
 
                 _dbContext.Users.Add(userDB);
-                _dbContext.Students.Add(new Student () { User = userDB});
+                _dbContext.Students.Add(new Student() { User = userDB });
                 await _dbContext.SaveChangesAsync();
 
                 response = Authenticate(registration.Email, registration.Password);
@@ -83,7 +83,7 @@ namespace AutoSchool.Controllers
 
             if (user != null)
             {
-                if(IsValidPassword(passwordReset.Password, response.Errors) &&
+                if (IsValidPassword(passwordReset.Password, response.Errors) &&
                     passwordReset.Password == passwordReset.ConfirmPassword)
                 {
                     user.Password = passwordReset.Password;
@@ -108,24 +108,30 @@ namespace AutoSchool.Controllers
         {
             var identity = GetIdentity(email, password);
 
-            var now = DateTime.UtcNow;
-
-            var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
-                    notBefore: now,
-                    claims: identity.Claims,
-                    expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
-                    signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            var response = new AuthenticateResponse()
+            if (identity != null)
             {
-                Token = encodedJwt,
-                Email = identity.Name
-            };
+                var now = DateTime.UtcNow;
 
-            return response;
+                var jwt = new JwtSecurityToken(
+                        issuer: AuthOptions.ISSUER,
+                        audience: AuthOptions.AUDIENCE,
+                        notBefore: now,
+                        claims: identity?.Claims,
+                        expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
+                        signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                var response = new AuthenticateResponse()
+                {
+                    Token = encodedJwt,
+                    Email = identity.Name
+                };
+                return response;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private ClaimsIdentity GetIdentity(string email, string password)

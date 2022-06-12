@@ -72,7 +72,7 @@ namespace AutoSchool.Services
 
             foreach (var answersToQuestion in answersToQuestionView)
             {
-                var question = questions.FirstOrDefault(x => x.Id == answersToQuestion.QuestionId && x.QuestionText == answersToQuestion.QuestionText);
+                var question = questions.FirstOrDefault(x => x.Id == answersToQuestion.QuestionId);
 
                 if (question == null)
                 {
@@ -81,16 +81,16 @@ namespace AutoSchool.Services
                 }
                 else
                 {
-                    if(question.Id == answersToQuestion.QuestionId && question.QuestionText == answersToQuestion.QuestionText)
+                    if(question.Id == answersToQuestion.QuestionId)
                     {
-                        var rightAnswers = question.Answers.Where(x => x.IsRight);
+                        var rightAnswers = question.Answers.Where(x => x.IsRight).ToList();
                         var amountRightAnswers = 0;
 
                         if (answersToQuestion.Answers.Count() == rightAnswers.Count())
                         {
                             foreach (var answer in answersToQuestion.Answers)
                             {
-                                var rightAnswer = rightAnswers.FirstOrDefault(x => x.Id == answer.AnswerId && x.TextAnswer == answer.TextAnswer);
+                                var rightAnswer = rightAnswers.FirstOrDefault(x => x.Id == answer.AnswerId);
                                 if (rightAnswer != null)
                                 {
                                     amountRightAnswers++;
@@ -114,7 +114,7 @@ namespace AutoSchool.Services
                             amountWrongQuestions++;
                         }
                     }
-                }
+                }               
             }
 
             if(test.AmountQuestions != amountWrongQuestions + amountRightQuestions)

@@ -27,7 +27,7 @@ namespace AutoSchool.Controllers
             _logger = logger;
             _dbContext = dbContext;
             _testService = testService;
-            _historyService = historyService;   
+            _historyService = historyService;
         }
 
         [HttpGet]
@@ -41,6 +41,7 @@ namespace AutoSchool.Controllers
 
             var test = _dbContext.Tests
                                     .Include(x => x.Questions)
+                                    .ThenInclude(x => x.Answers)
                                     .FirstOrDefault(x => x.Id == themeId);
 
             if (test == null)
@@ -81,7 +82,7 @@ namespace AutoSchool.Controllers
             {
                 return StatusCode(StatusCodes.Status401Unauthorized);
             }
-            
+
 
             var resultTestView = await _testService.CheckTestResults(test, userDb.Student.UserId, answersToQuestionViews);
             return resultTestView;
@@ -113,7 +114,7 @@ namespace AutoSchool.Controllers
                                     .OrderByDescending(x => x.Date)
                                     .Where(x => x.Result == 1 && x.StudentUserId == userDb.Student.UserId)
                                     .FirstOrDefault();
-            if(resultTest == null)
+            if (resultTest == null)
             {
                 resultTest = test.ResultTests
                                     .OrderByDescending(x => x.Date)

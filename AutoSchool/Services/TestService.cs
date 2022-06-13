@@ -22,7 +22,7 @@ namespace AutoSchool.Services
 
             if (test.AmountQuestions >= test.Questions.Count())
             {
-                foreach(var question in test.Questions)
+                foreach (var question in test.Questions)
                 {
                     questionsView.Add(question.ConvertQuestionToQuestionView());
                 }
@@ -81,7 +81,7 @@ namespace AutoSchool.Services
                 }
                 else
                 {
-                    if(question.Id == answersToQuestion.QuestionId)
+                    if (question.Id == answersToQuestion.QuestionId)
                     {
                         var rightAnswers = question.Answers.Where(x => x.IsRight).ToList();
                         var amountRightAnswers = 0;
@@ -97,15 +97,15 @@ namespace AutoSchool.Services
 
                                     questionAnswers.Add(new QuestionAnswers()
                                     {
-                                        ResultTest  = resultTest,
+                                        ResultTest = resultTest,
                                         QuestionId = question.Id,
-                                        AnswerId = answer.AnswerId, 
+                                        AnswerId = answer.AnswerId,
                                     });
                                 }
                             }
                         }
 
-                        if(amountRightAnswers == rightAnswers.Count())
+                        if (amountRightAnswers == rightAnswers.Count())
                         {
                             amountRightQuestions++;
                         }
@@ -114,10 +114,10 @@ namespace AutoSchool.Services
                             amountWrongQuestions++;
                         }
                     }
-                }               
+                }
             }
 
-            if(test.AmountQuestions != amountWrongQuestions + amountRightQuestions)
+            if (test.AmountQuestions != amountWrongQuestions + amountRightQuestions)
             {
                 resultTestView.Errors.Add("Ошибка,количество вопросов и ответов не совпадает");
             }
@@ -135,7 +135,7 @@ namespace AutoSchool.Services
                 resultTest.TestId = test.Id;
                 resultTest.QuestionAnswers = questionAnswers;
 
-                _dbContext.ResultTests.Add(resultTest);             
+                _dbContext.ResultTests.Add(resultTest);
                 _dbContext.QuestionAnswers.AddRange(questionAnswers);
                 await _dbContext.SaveChangesAsync();
 
@@ -147,11 +147,20 @@ namespace AutoSchool.Services
                                             .ThenInclude(x => x.ResultTests)
                                             .Where(x => x.CourseId == course.Id).ToList();
 
-                var countTheme = themes.Count();
-                var countFinishedTheme = themes.Where(x => x.Test != null && x.Test.ResultTests.Any(z => z.Result == 1)).Count();
-
                 studentCourse.Status = "Курс начат";
-                studentCourse.Progress = (countFinishedTheme / (double)countTheme) * 100;
+
+                if (result == 1)
+                {
+                    var countTheme = themes.Count();
+                    var countFinishedTheme = themes.Where(x => x.Test != null && x.Test.ResultTests.Any(z => z.Result == 1)).Count();
+
+                    studentCourse.Progress = (countFinishedTheme / (double)countTheme) * 100;
+
+                    if (studentCourse.Progress == 1)
+                    {
+                        studentCourse.Status = "Курс пройден";
+                    }
+                }
 
                 _dbContext.StudentsCourses.Update(studentCourse);
                 await _dbContext.SaveChangesAsync();

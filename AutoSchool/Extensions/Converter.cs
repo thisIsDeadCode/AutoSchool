@@ -9,7 +9,7 @@ namespace AutoSchool.Extensions
         public static CourseResponse ConvertCourseToCourseView(this Course course)
         {
             long amountLecture = 0;
-            foreach(var theme in course.Themes)
+            foreach (var theme in course.Themes)
             {
                 amountLecture += theme.Lectures.Count();
             }
@@ -66,8 +66,8 @@ namespace AutoSchool.Extensions
             var tests = visitHistories.Where(x => x.TestId != null).ToList();
 
 
-            linksLeftMenuView.HrefCourses = courses.Select(x => new Link 
-            { 
+            linksLeftMenuView.HrefCourses = courses.Select(x => new Link
+            {
                 Title = x.Course.Name,
                 Href = $"Course/Get?Id={x.CourseId}"
             }).ToList();
@@ -93,7 +93,7 @@ namespace AutoSchool.Extensions
             return linksLeftMenuView;
         }
 
-        public static ThemeResponse ConvertThemeToThemeView(this Theme theme)
+        public static ThemeResponse ConvertThemeToThemeView(this Theme theme, User user)
         {
             var themeView = new ThemeResponse()
             {
@@ -103,20 +103,20 @@ namespace AutoSchool.Extensions
                 AmountLecture = theme.Lectures.Count()
             };
 
-            var lastResult = theme.Test?.ResultTests?.OrderByDescending(x => x.Date).FirstOrDefault();
+            var lastResult = theme.Test?.ResultTests?.OrderByDescending(x => x.Date).FirstOrDefault(x => x.StudentUserId == user.Id);
 
             var lastRightResult = theme.Test?.ResultTests?
-                                        .Where(x => x.Test.ResultTests.Any(z => z.Result == 1))
-                                        .OrderByDescending(x => x.Date).FirstOrDefault();
+                                        .OrderByDescending(x => x.Date)
+                                        .FirstOrDefault(x => x.StudentUserId == user.Id && x.Result == 1);
 
-            if(lastResult == null && lastRightResult == null)
+            if (lastResult == null && lastRightResult == null)
             {
                 themeView.Status = "Тест не начат";
                 themeView.IsActiveButtonLastResultTest = false;
             }
             else
             {
-                if(lastRightResult == null)
+                if (lastRightResult == null)
                 {
                     themeView.Status = "Тест не пройден";
                     themeView.TestDate = null;
@@ -128,7 +128,7 @@ namespace AutoSchool.Extensions
                 }
                 themeView.IsActiveButtonLastResultTest = true;
             }
-           
+
             return themeView;
         }
 

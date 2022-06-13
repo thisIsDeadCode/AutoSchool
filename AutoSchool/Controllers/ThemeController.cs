@@ -18,7 +18,7 @@ namespace AutoSchool.Controllers
         private readonly HistoryService _historyService;
 
         public ThemeController(ILogger<UserController> logger,
-            ApplicationDbContext dbContext, 
+            ApplicationDbContext dbContext,
             HistoryService historyService)
         {
             _logger = logger;
@@ -30,20 +30,24 @@ namespace AutoSchool.Controllers
         [Route("Theme/GetAllThemes")]
         public async Task<ActionResult<IEnumerable<ThemeResponse>>> GetAllThemes(long courseId)
         {
-            Course? course =  await  _dbContext.Courses
-                                    .Include(c => c.Themes)
-                                    .ThenInclude(x => x.Lectures)
-                                    .FirstOrDefaultAsync(x=>x.Id == courseId); 
-            if(course != null)
-            {
-                var themes = new List<ThemeResponse>();
+            var themes = _dbContext.Themes.Include(c => c.Test)
+                                              .ThenInclude(c => c.ResultTests)
+                                              .Include(c => c.Lectures)
+                                              .Where(x => x.CourseId == courseId);
 
-                foreach (var theme in course.Themes)
-                {                    
-                    themes.Add(theme.ConvertThemeToThemeView());
+            User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+
+            if (userDb != null && themes != null && themes.Count() > 0)
+            {
+                var themesResponse = new List<ThemeResponse>();
+
+                foreach (var theme in themes)
+                {
+                    themesResponse.Add(theme.ConvertThemeToThemeView(userDb));
                 }
 
-                return themes;
+                return themesResponse;
             }
             else
             {
@@ -56,16 +60,16 @@ namespace AutoSchool.Controllers
         public async Task<ActionResult<ThemeResponse>> Get(long Id)
         {
             Theme? theme = await _dbContext.Themes
-                                              .Include(c => c.Test)   
+                                              .Include(c => c.Test)
                                               .ThenInclude(c => c.ResultTests)
                                               .Include(c => c.Lectures)
                                               .FirstOrDefaultAsync(x => x.Id == Id);
 
             User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
-            if (theme != null && userDb != null)
+            if (userDb != null && theme != null && userDb != null)
             {
-                ThemeResponse themeView = theme.ConvertThemeToThemeView();
+                ThemeResponse themeView = theme.ConvertThemeToThemeView(userDb);
 
                 await _historyService.SaveTohistory(userDb, theme);
 

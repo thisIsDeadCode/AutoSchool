@@ -69,21 +69,23 @@ namespace AutoSchool.Controllers
                                                   .ThenInclude(s => s.User)
                                               .Include(x => x.Themes)
                                                  .ThenInclude(y => y.Lectures)
-                                              .FirstOrDefaultAsync(x=> x.Id == Id);
+                                              .FirstOrDefaultAsync(x => x.Id == Id);
 
 
-            User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            User? userDb = await _dbContext.Users.Include(x => x.Student)
+                                    .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
             if (course != null && userDb != null)
             {
-                var studentCourse = await _dbContext.StudentsCourses.FirstOrDefaultAsync(x => x.CourseId == course.Id);
+                var studentCourse = await _dbContext.StudentsCourses.FirstOrDefaultAsync(x => x.CourseId == course.Id && x.StudentId == userDb.Id);
 
                 if (studentCourse == null)
                 {
                     _dbContext.StudentsCourses.Add(new StudentsCourses()
                     {
                         CourseId = course.Id,
-                        StudentId = userDb.Id,
+                        StudentId = userDb.Student.UserId,
+                        Student = userDb.Student,
                         Progress = 0,
                         AccessToCourse = true,
                         Status = "Курс не начат"
@@ -115,7 +117,7 @@ namespace AutoSchool.Controllers
             {
                 result = await GetCourses(true);
             }
-            else if(status == "finished")
+            else if (status == "finished")
             {
                 result = await GetCourses(false, true);
             }
@@ -153,11 +155,11 @@ namespace AutoSchool.Controllers
                 coursesView.LoadProgressToCourses(_dbContext, userDb.Id);
 
 
-                if(ongoing == true && finished == false)
+                if (ongoing == true && finished == false)
                 {
                     result = coursesView.Where(x => x.Progress > 0).ToList();
                 }
-                else if(ongoing == false && finished == true)
+                else if (ongoing == false && finished == true)
                 {
                     result = coursesView.Where(x => x.Progress == 1).ToList();
                 }

@@ -71,17 +71,19 @@ namespace AutoSchool.Controllers
                                                  .ThenInclude(y => y.Lectures)
                                               .FirstOrDefaultAsync(x=> x.Id == Id);
 
+
             User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
             if (course != null && userDb != null)
             {
                 var studentCourse = await _dbContext.StudentsCourses.FirstOrDefaultAsync(x => x.CourseId == course.Id);
 
-                if (studentCourse != null)
+                if (studentCourse == null)
                 {
                     _dbContext.StudentsCourses.Add(new StudentsCourses()
                     {
                         CourseId = course.Id,
+                        StudentId = userDb.Id,
                         Progress = 0,
                         AccessToCourse = true,
                         Status = "Курс не начат"

@@ -123,6 +123,7 @@ namespace AutoSchool.Services
             }
             else
             {
+
                 double result = amountRightQuestions / test.AmountQuestions;
 
                 resultTest.Status = result == 1 ? "Тест пройден" : "Тест не пройден";
@@ -134,8 +135,25 @@ namespace AutoSchool.Services
                 resultTest.TestId = test.Id;
                 resultTest.QuestionAnswers = questionAnswers;
 
-                _dbContext.ResultTests.Add(resultTest);
+                _dbContext.ResultTests.Add(resultTest);             
                 _dbContext.QuestionAnswers.AddRange(questionAnswers);
+                await _dbContext.SaveChangesAsync();
+
+
+                var course = test.Theme.Course;
+                var studentCourse = await _dbContext.StudentsCourses.FirstOrDefaultAsync(x => x.CourseId == course.Id && x.StudentId == userId);
+
+                var themes = _dbContext.Themes.Include(x => x.Test)
+                                            .ThenInclude(x => x.ResultTests)
+                                            .Where(x => x.CourseId == course.Id).ToList();
+
+                var countTheme = themes.Count();
+                var countFinishedTheme = themes.Where(x => x.Test != null && x.Test.ResultTests.Any(z => z.Result == 1)).Count();
+
+                studentCourse.Status = "Курс начат";
+                studentCourse.Progress = (countFinishedTheme / (double)countTheme) * 100;
+
+                _dbContext.StudentsCourses.Update(studentCourse);
                 await _dbContext.SaveChangesAsync();
 
                 resultTestView.Id = resultTest.Id;

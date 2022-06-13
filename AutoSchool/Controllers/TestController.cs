@@ -69,6 +69,8 @@ namespace AutoSchool.Controllers
                                             .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
             var test = _dbContext.Tests
+                                .Include(x =>x.Theme)
+                                .ThenInclude(x => x.Course)
                                 .Include(x => x.Questions)
                                 .ThenInclude(x => x.Answers)
                                 .FirstOrDefault(x => x.Id == themeId);

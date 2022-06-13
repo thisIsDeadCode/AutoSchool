@@ -75,6 +75,20 @@ namespace AutoSchool.Controllers
 
             if (course != null && userDb != null)
             {
+                var studentCourse = await _dbContext.StudentsCourses.FirstOrDefaultAsync(x => x.CourseId == course.Id);
+
+                if (studentCourse != null)
+                {
+                    _dbContext.StudentsCourses.Add(new StudentsCourses()
+                    {
+                        CourseId = course.Id,
+                        Progress = 0,
+                        AccessToCourse = true,
+                        Status = "Курс не начат"
+                    });
+                    await _dbContext.SaveChangesAsync();
+                }
+
                 CourseResponse courseView = course.ConvertCourseToCourseView();
                 courseView.LoadProgressToCourse(_dbContext, userDb.Id);
 

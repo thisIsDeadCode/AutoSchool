@@ -13,8 +13,9 @@ namespace AutoSchool.Extensions
 
             foreach (CourseResponse course in courses)
             {
-                var ctc = studentsCourses.FirstOrDefault(ctc => ctc.CourseId == course.Id);
-                course.Progress = ctc == null ? 0 : ctc.Progress;
+                var studentCourse = studentsCourses.FirstOrDefault(ctc => ctc.CourseId == course.Id);
+                course.Progress = studentCourse == null ? 0 : studentCourse.Progress;
+                course.Status = studentCourse == null ? "Курс не начат" : studentCourse.Status;
             }
         }
 
@@ -22,6 +23,7 @@ namespace AutoSchool.Extensions
         {
             StudentsCourses? studentCourse = dbContext.StudentsCourses.FirstOrDefault(x => x.StudentId == UserId && x.CourseId == course.Id);
             course.Progress = studentCourse == null ? 0 : studentCourse.Progress;
+            course.Status = studentCourse == null ? "Курс не начат" : studentCourse.Status;
         }
     }
 }

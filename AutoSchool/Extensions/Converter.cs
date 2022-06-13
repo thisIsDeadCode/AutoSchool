@@ -18,6 +18,7 @@ namespace AutoSchool.Extensions
             {
                 Id = course.Id,
                 Name = course.Name,
+                Status = "Курс не начат",
                 Progress = 0,
                 AmountLecture = amountLecture,
                 AmountThemes = course.Themes.Count(),

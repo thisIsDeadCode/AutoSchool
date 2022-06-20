@@ -207,7 +207,7 @@ namespace AutoSchool.Extensions
                         {
                             ThemeId = testResult.Test.Theme.Id,
                             NameTheme = testResult.Test.Theme.Name,
-                            Progress = testResult.Result,
+                            Progress = testResult.Result * 100,
                             Status = testResult.Status,
                             Date = testResult.Date
                         });

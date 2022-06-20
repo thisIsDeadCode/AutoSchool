@@ -181,5 +181,42 @@ namespace AutoSchool.Extensions
 
             return resultTestView;
         }
+
+        public static List<GradesResponse> ConvertCourseToGradesResponse(this Course course)
+        {
+            var courseGrades = new List<GradesResponse>();
+
+            foreach (var studentsCoursies in course.StudentsCoursies)
+            {
+                var userGrades = new GradesResponse()
+                {
+                    CourseId = course.Id,
+                    NameCourse = course.Name,
+                    UserId = studentsCoursies.Student.User.Id,
+                    FullName = studentsCoursies.Student.User.FullName,
+                    Email = studentsCoursies.Student.User.Email,
+                };
+                userGrades.Grades = new List<GradeResponse>();
+                var resultTests = studentsCoursies.Student.ResultTests;
+
+                if (resultTests != null)
+                {
+                    foreach (var testResult in studentsCoursies.Student.ResultTests)
+                    {
+                        userGrades.Grades.Add(new GradeResponse()
+                        {
+                            ThemeId = testResult.Test.Theme.Id,
+                            NameTheme = testResult.Test.Theme.Name,
+                            Progress = testResult.Result,
+                            Status = testResult.Status,
+                            Date = testResult.Date
+                        });
+                    }
+                    courseGrades.Add(userGrades);
+                }
+            }
+
+            return courseGrades;
+        }
     }
 }

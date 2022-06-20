@@ -2,15 +2,9 @@
 {
     public class LinksLeftMenuResponse : Response
     {
-        public IEnumerable<Link> HrefCourses { get; set; }
-        public IEnumerable<Link> HrefThemes { get; set; }
-        public IEnumerable<Link> HrefLectures { get; set; }
-        public IEnumerable<Link> HrefTests { get; set; }
-
-        public class Link
-        {
-            public string Title { get; set; }
-            public string Href { get; set; }
-        }
+        public IEnumerable<LinkResponse> HrefCourses { get; set; }
+        public IEnumerable<LinkResponse> HrefThemes { get; set; }
+        public IEnumerable<LinkResponse> HrefLectures { get; set; }
+        public IEnumerable<LinkResponse> HrefTests { get; set; }
     }
 }

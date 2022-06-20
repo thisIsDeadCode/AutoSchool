@@ -66,25 +66,25 @@ namespace AutoSchool.Extensions
             var tests = visitHistories.Where(x => x.TestId != null).ToList();
 
 
-            linksLeftMenuView.HrefCourses = courses.Select(x => new Link
+            linksLeftMenuView.HrefCourses = courses.Select(x => new LinkResponse
             {
                 Title = x.Course.Name,
                 Href = $"Course/Get?Id={x.CourseId}"
             }).ToList();
 
-            linksLeftMenuView.HrefThemes = themes.Select(x => new Link
+            linksLeftMenuView.HrefThemes = themes.Select(x => new LinkResponse
             {
                 Title = x.Theme.Name,
                 Href = $"Theme/Get?Id={x.ThemeId}"
             }).ToList();
 
-            linksLeftMenuView.HrefLectures = lectures.Select(x => new Link
+            linksLeftMenuView.HrefLectures = lectures.Select(x => new LinkResponse
             {
                 Title = x.Lecture.Name,
                 Href = $"Lecture/Get?Id={x.LectureId}"
             }).ToList();
 
-            linksLeftMenuView.HrefTests = tests.Select(x => new Link
+            linksLeftMenuView.HrefTests = tests.Select(x => new LinkResponse
             {
                 Title = x.Test.Name,
                 Href = $"Test/Get?Id={x.TestId}"

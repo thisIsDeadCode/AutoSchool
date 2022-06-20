@@ -123,7 +123,7 @@ namespace AutoSchool.Controllers
                                     .FirstOrDefault();
             }
 
-            return resultTest.ConvertResultTestToResultTestViewView();
+            return resultTest.ConvertResultTestToResultTestResponse();
         }
     }
 }

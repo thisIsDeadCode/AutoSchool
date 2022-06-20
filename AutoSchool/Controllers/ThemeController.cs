@@ -44,7 +44,7 @@ namespace AutoSchool.Controllers
 
                 foreach (var theme in themes)
                 {
-                    themesResponse.Add(theme.ConvertThemeToThemeView(userDb));
+                    themesResponse.Add(theme.ConvertThemeToThemeResponse(userDb));
                 }
 
                 return themesResponse;
@@ -69,7 +69,7 @@ namespace AutoSchool.Controllers
 
             if (userDb != null && theme != null && userDb != null)
             {
-                ThemeResponse themeView = theme.ConvertThemeToThemeView(userDb);
+                ThemeResponse themeView = theme.ConvertThemeToThemeResponse(userDb);
 
                 await _historyService.SaveTohistory(userDb, theme);
 

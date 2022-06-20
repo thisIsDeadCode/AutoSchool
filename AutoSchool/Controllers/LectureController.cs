@@ -39,7 +39,7 @@ namespace AutoSchool.Controllers
 
                 foreach (var lecture in theme.Lectures)
                 {
-                    lectures.Add(lecture.ConvertLectureToLectureView());
+                    lectures.Add(lecture.ConvertLectureToLectureResponse());
                 }
 
                 return lectures;
@@ -60,7 +60,7 @@ namespace AutoSchool.Controllers
 
             if (lecture != null && userDb != null)
             {
-                LectureResponse lectureView = lecture.ConvertLectureToLectureView();
+                LectureResponse lectureView = lecture.ConvertLectureToLectureResponse();
 
                 //if(themeId != null)
                 //{
@@ -135,7 +135,7 @@ namespace AutoSchool.Controllers
                     return BadRequest();
                 }
 
-                LectureResponse resultLectureView = resultLecture.ConvertLectureToLectureView();
+                LectureResponse resultLectureView = resultLecture.ConvertLectureToLectureResponse();
                 resultLectureView.HasPrevious = hasPrevious;
                 resultLectureView.NasNext = hasNext;
 

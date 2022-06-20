@@ -49,7 +49,7 @@ namespace AutoSchool.Controllers
                 visitHistory.AddRange(query.Where(x => x.TestId != null).Take(3)); 
 
 
-                return visitHistory.ConvertVisitHistoriesToLinksLeftMenu();
+                return visitHistory.ConvertVisitHistoriesToLinksLeftMenuResponse();
             }
             else
             {

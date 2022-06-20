@@ -43,7 +43,7 @@ namespace AutoSchool.Controllers
 
             foreach (var course in courses)
             {
-                coursesView.Add(course.ConvertCourseToCourseView());
+                coursesView.Add(course.ConvertCourseToCourseResponse());
             }
 
             User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
@@ -93,7 +93,7 @@ namespace AutoSchool.Controllers
                     await _dbContext.SaveChangesAsync();
                 }
 
-                CourseResponse courseView = course.ConvertCourseToCourseView();
+                CourseResponse courseView = course.ConvertCourseToCourseResponse();
                 courseView.LoadProgressToCourse(_dbContext, userDb.Id);
 
                 await _historyService.SaveTohistory(userDb, course);
@@ -149,7 +149,7 @@ namespace AutoSchool.Controllers
 
                 foreach (var course in courses)
                 {
-                    coursesView.Add(course.ConvertCourseToCourseView());
+                    coursesView.Add(course.ConvertCourseToCourseResponse());
                 }
 
                 coursesView.LoadProgressToCourses(_dbContext, userDb.Id);

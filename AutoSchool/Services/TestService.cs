@@ -24,7 +24,7 @@ namespace AutoSchool.Services
             {
                 foreach (var question in test.Questions)
                 {
-                    questionsView.Add(question.ConvertQuestionToQuestionView());
+                    questionsView.Add(question.ConvertQuestionToQuestionResponse());
                 }
             }
             else
@@ -36,7 +36,7 @@ namespace AutoSchool.Services
                 for (int i = 0; i < test.AmountQuestions; i++)
                 {
                     var index = random.Next(0, max);
-                    questionsView.Add(tmpQuestions[index].ConvertQuestionToQuestionView());
+                    questionsView.Add(tmpQuestions[index].ConvertQuestionToQuestionResponse());
                 }
             }
 

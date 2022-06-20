@@ -6,7 +6,7 @@ namespace AutoSchool.Extensions
 {
     public static class Converter
     {
-        public static CourseResponse ConvertCourseToCourseView(this Course course)
+        public static CourseResponse ConvertCourseToCourseResponse(this Course course)
         {
             long amountLecture = 0;
             foreach (var theme in course.Themes)
@@ -56,7 +56,7 @@ namespace AutoSchool.Extensions
             return courseView;
         }
 
-        public static LinksLeftMenuResponse ConvertVisitHistoriesToLinksLeftMenu(this IEnumerable<VisitHistory> visitHistories)
+        public static LinksLeftMenuResponse ConvertVisitHistoriesToLinksLeftMenuResponse(this IEnumerable<VisitHistory> visitHistories)
         {
             var linksLeftMenuView = new LinksLeftMenuResponse();
 
@@ -93,7 +93,7 @@ namespace AutoSchool.Extensions
             return linksLeftMenuView;
         }
 
-        public static ThemeResponse ConvertThemeToThemeView(this Theme theme, User user)
+        public static ThemeResponse ConvertThemeToThemeResponse(this Theme theme, User user)
         {
             var themeView = new ThemeResponse()
             {
@@ -132,7 +132,7 @@ namespace AutoSchool.Extensions
             return themeView;
         }
 
-        public static LectureResponse ConvertLectureToLectureView(this Lecture lecture)
+        public static LectureResponse ConvertLectureToLectureResponse(this Lecture lecture)
         {
             var lectureView = new LectureResponse()
             {
@@ -145,7 +145,7 @@ namespace AutoSchool.Extensions
             return lectureView;
         }
 
-        public static QuestionResponse ConvertQuestionToQuestionView(this Question question)
+        public static QuestionResponse ConvertQuestionToQuestionResponse(this Question question)
         {
             var questionView = new QuestionResponse()
             {
@@ -167,7 +167,7 @@ namespace AutoSchool.Extensions
             return questionView;
         }
 
-        public static ResultTestResponse ConvertResultTestToResultTestViewView(this ResultTest resultTest)
+        public static ResultTestResponse ConvertResultTestToResultTestResponse(this ResultTest resultTest)
         {
             var resultTestView = new ResultTestResponse()
             {

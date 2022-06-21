@@ -54,5 +54,56 @@ namespace AutoSchool.Controllers
 
             return grades;
         }
+
+        [HttpGet]
+        [Route("Grade/GetReport")]
+        public async Task<ActionResult<IEnumerable<GradesResponse>>> GetReport(long courseId)
+        {
+            var grades = new List<GradesResponse>();
+
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            Course? course = await _dbContext.Courses
+                                                .Include(x => x.Themes)
+                                                    .ThenInclude(x => x.Test)
+                                                        .ThenInclude(x => x.ResultTests)
+                                                .Include(x => x.StudentsCoursies)
+                                                    .ThenInclude(x => x.Student)
+                                                        .ThenInclude(x => x.User)
+                                                .FirstOrDefaultAsync(x => x.Id == courseId);
+
+            if (user != null && course != null)
+            {
+                var courseGrades = course.ConvertCourseToGradesResponse();
+                foreach(var grade in courseGrades)
+                {
+                    var results = grade.Grades.GroupBy(x => x.NameTheme).OrderBy(x => x.Key).ToList();
+
+                    grade.Grades = new List<GradeResponse>();
+
+                    foreach(var result in results)
+                    {
+                        var lastRightResult = result.OrderByDescending(x => x.Date).FirstOrDefault(x => x.Progress == 1);
+                        var lastResult = result.OrderByDescending(x => x.Date).FirstOrDefault();
+
+                        if (lastRightResult != null)
+                        {
+                            grade.Grades.Add(lastRightResult);
+                        }
+                        else
+                        {
+                            grade.Grades.Add(lastResult);
+                        }
+                    }
+                    
+                    grades.Add(grade);
+                }
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status404NotFound);
+            }
+
+            return grades;
+        }
     }
 }

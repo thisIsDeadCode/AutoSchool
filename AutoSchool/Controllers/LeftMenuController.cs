@@ -31,6 +31,10 @@ namespace AutoSchool.Controllers
         {
             User? userDb = await _dbContext.Users.Include(x => x.Teacher)
                                                 .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            if(userDb == null)
+            {
+                return new SectionsForLeftMenuResponse();
+            }
 
             var myCourses = _dbContext.Courses.Include(x => x.Teacher).ToList();
             var myCoursesForTeacher = myCourses.Where(x => x.Teacher.UserId == userDb.Id).ToList();
@@ -40,7 +44,7 @@ namespace AutoSchool.Controllers
             var sections = new SectionsForLeftMenuResponse();
             sections.Sections = new List<SectionResponse>();
 
-            if (userDb != null && User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 if(isTeacher)
                 {
@@ -77,12 +81,11 @@ namespace AutoSchool.Controllers
                 }
 
                 sections.Sections.Add(myCoursesSection);
-
                 return sections;
             }
             else
             {
-                return Ok();
+                return StatusCode(StatusCodes.Status404NotFound);
             }
         }
     }

@@ -136,13 +136,30 @@ namespace AutoSchool.Controllers
 
         private ClaimsIdentity GetIdentity(string email, string password)
         {
-            User user = _dbContext.Users.FirstOrDefault(x => x.Email == email && x.Password == password);
+            User? user = _dbContext.Users.Include(x => x.Teacher)
+                                        .Include(x => x.Student)
+                                        .FirstOrDefault(x => x.Email == email && x.Password == password);
+            string role = null;
+
+            if(user.IsAdmin == true)
+            {
+                role = "Admin";
+            }
+            else if(user.Teacher != null)
+            {
+                role = "Teacher";
+            }
+            else
+            {
+                role = "Student";
+            }
+            
             if (user != null)
             {
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.Email),
-                    //new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role)
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

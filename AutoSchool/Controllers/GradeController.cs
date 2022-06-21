@@ -12,6 +12,7 @@ using System.Security.Claims;
 namespace AutoSchool.Controllers
 {
     [ApiController]
+    [Authorize]
     public class GradeController : ControllerBase
     {
 
@@ -33,7 +34,11 @@ namespace AutoSchool.Controllers
         {
             var grades = new List<GradesResponse>();
 
-            User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            User? userDb = await _dbContext.Users.Include(x => x.Teacher)
+                                                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var isTeacher = userDb.Teacher == null ? false : true;
+
             Course? course = await _dbContext.Courses
                                                 .Include(x => x.Themes)
                                                     .ThenInclude(x => x.Test)
@@ -43,7 +48,7 @@ namespace AutoSchool.Controllers
                                                         .ThenInclude(x => x.User)
                                                 .FirstOrDefaultAsync(x => x.Id == courseId);
 
-            if (user != null && course != null)
+            if (userDb != null && course != null && isTeacher)
             {
                 grades = course.ConvertCourseToGradesResponse();
             }
@@ -61,7 +66,10 @@ namespace AutoSchool.Controllers
         {
             var grades = new List<GradesResponse>();
 
-            User? user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            User? userDb = await _dbContext.Users.Include(x => x.Teacher)
+                                                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            var isTeacher = userDb.Teacher == null ? false : true;
+
             Course? course = await _dbContext.Courses
                                                 .Include(x => x.Themes)
                                                     .ThenInclude(x => x.Test)
@@ -71,7 +79,7 @@ namespace AutoSchool.Controllers
                                                         .ThenInclude(x => x.User)
                                                 .FirstOrDefaultAsync(x => x.Id == courseId);
 
-            if (user != null && course != null)
+            if (userDb != null && course != null && isTeacher)
             {
                 var courseGrades = course.ConvertCourseToGradesResponse();
                 foreach(var grade in courseGrades)

@@ -26,30 +26,59 @@ namespace AutoSchool.Controllers
         }
 
         [HttpGet]
-        [Route("Button/GetHrefForButtons")]
-        public async Task<ActionResult<LinksLeftMenuResponse>> GetHrefForButtons()
+        [Route("Button/GetButtonsForLeftMenu")]
+        public async Task<ActionResult<SectionsForLeftMenuResponse>> GetButtonsForLeftMenu()
         {
-            User? userDb = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            User? userDb = await _dbContext.Users.Include(x => x.Teacher)
+                                                .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            var myCourses = _dbContext.Courses.Include(x => x.Teacher).ToList();
+            var myCoursesForTeacher = myCourses.Where(x => x.Teacher.UserId == userDb.Id).ToList();
+
+            var isTeacher = userDb.Teacher == null ? false : true;
+
+            var sections = new SectionsForLeftMenuResponse();
+            sections.Sections = new List<SectionResponse>();
 
             if (userDb != null && User.Identity.IsAuthenticated)
             {
+                if(isTeacher)
+                {
+                    var gradeSection = new SectionResponse()
+                    {
+                        Name = "Оценки",
+                        Buttons = new List<LinkResponse>()
+                    };
 
-                IQueryable<VisitHistory> query = _dbContext.VisitHistories
-                                                .Include(x => x.Course)
-                                                .Include(x => x.Theme)
-                                                .Include(x => x.Lecture)
-                                                .Include(x => x.Test)
-                                                .Where(x => x.UserId == userDb.Id)
-                                                .OrderByDescending(x => x.Date);
+                    foreach(var myCourse in myCoursesForTeacher)
+                    {
+                        gradeSection.Buttons.Add(new LinkResponse()
+                        {
+                            Title = myCourse.Name,
+                            Href = $"Grade/GetReport?Id={myCourse.Id}"
+                        });
+                    }
+                    sections.Sections.Add(gradeSection);
+                }
 
-                List<VisitHistory> visitHistory = new List<VisitHistory>();
-                visitHistory.AddRange(query.Where(x => x.CourseId != null).Take(3));
-                visitHistory.AddRange(query.Where(x => x.ThemeId != null).Take(3));
-                visitHistory.AddRange(query.Where(x => x.LectureId != null).Take(3));
-                visitHistory.AddRange(query.Where(x => x.TestId != null).Take(3)); 
+                var myCoursesSection = new SectionResponse()
+                {
+                    Name = "Мои курсы",
+                    Buttons = new List<LinkResponse>()
+                };
 
+                foreach (var myCourse in myCourses)
+                {
+                    myCoursesSection.Buttons.Add(new LinkResponse()
+                    {
+                        Title = myCourse.Name,
+                        Href = $"Course/Get?Id={myCourse.Id}"
+                    });
+                }
 
-                return visitHistory.ConvertVisitHistoriesToLinksLeftMenuResponse();
+                sections.Sections.Add(myCoursesSection);
+
+                return sections;
             }
             else
             {

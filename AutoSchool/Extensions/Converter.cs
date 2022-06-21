@@ -1,6 +1,5 @@
 ﻿using AutoSchool.Models.Tables;
 using AutoSchool.Models.Views;
-using static AutoSchool.Models.Views.LinksLeftMenuResponse;
 
 namespace AutoSchool.Extensions
 {
@@ -54,43 +53,6 @@ namespace AutoSchool.Extensions
             };
 
             return courseView;
-        }
-
-        public static LinksLeftMenuResponse ConvertVisitHistoriesToLinksLeftMenuResponse(this IEnumerable<VisitHistory> visitHistories)
-        {
-            var linksLeftMenuView = new LinksLeftMenuResponse();
-
-            var courses = visitHistories.Where(x => x.CourseId != null).ToList();
-            var themes = visitHistories.Where(x => x.ThemeId != null).ToList();
-            var lectures = visitHistories.Where(x => x.LectureId != null).ToList();
-            var tests = visitHistories.Where(x => x.TestId != null).ToList();
-
-
-            linksLeftMenuView.HrefCourses = courses.Select(x => new LinkResponse
-            {
-                Title = x.Course.Name,
-                Href = $"Course/Get?Id={x.CourseId}"
-            }).ToList();
-
-            linksLeftMenuView.HrefThemes = themes.Select(x => new LinkResponse
-            {
-                Title = x.Theme.Name,
-                Href = $"Theme/Get?Id={x.ThemeId}"
-            }).ToList();
-
-            linksLeftMenuView.HrefLectures = lectures.Select(x => new LinkResponse
-            {
-                Title = x.Lecture.Name,
-                Href = $"Lecture/Get?Id={x.LectureId}"
-            }).ToList();
-
-            linksLeftMenuView.HrefTests = tests.Select(x => new LinkResponse
-            {
-                Title = x.Test.Name,
-                Href = $"Test/Get?Id={x.TestId}"
-            }).ToList();
-
-            return linksLeftMenuView;
         }
 
         public static ThemeResponse ConvertThemeToThemeResponse(this Theme theme, User user)

@@ -61,8 +61,8 @@ namespace AutoSchool.Controllers
         }
 
         [HttpGet]
-        [Route("Grade/GetReport")]
-        public async Task<ActionResult<IEnumerable<GradesResponse>>> GetReport(long courseId)
+        [Route("Grade/GetReportByCourse")]
+        public async Task<ActionResult<IEnumerable<GradesResponse>>> GetReportByCourse(long courseId)
         {
             var grades = new List<GradesResponse>();
 
